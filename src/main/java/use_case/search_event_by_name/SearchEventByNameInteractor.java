@@ -16,6 +16,5 @@ public class SearchEventByNameInteractor implements SearchEventByNameInputBounda
     @Override
     public void switchToDashboardView() {
         userPresenter.switchToDashboardView();
-
     }
 }

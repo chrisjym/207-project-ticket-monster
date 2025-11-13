@@ -3,46 +3,42 @@ package view;
 import javax.swing.*;
 import entity.Event;
 import interface_adapter.search_event_by_name.SearchEventByNameController;
-import interface_adapter.signup.SignupController;
+import interface_adapter.search_event_by_name.SearchEventByNameViewModel;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeListener;
 import java.net.URL;
 
-public class EventView extends JPanel {
+public class SearchEventByNameView extends JPanel {
 
     private final String viewName = "event search";
-    private final Event event;
+    private final SearchEventByNameViewModel searchEventByNameViewModel;
     private SearchEventByNameController eventController = null;
 
 
     /**
      * Constructor for the EventView, takes an event and returns a view of its details
-     * @param event
-     * @param eventController
+     * @param searchEventByNameViewModel
      */
-    public EventView(Event event, SearchEventByNameController eventController) {
-        this.event = event;
-        this.eventController = eventController;
-
+    public SearchEventByNameView(SearchEventByNameViewModel searchEventByNameViewModel) {
+        this.searchEventByNameViewModel = searchEventByNameViewModel;
         this.setLayout(new BorderLayout());
 
-        JPanel detailsPanel = createDetailsPanel(event);
+        JPanel detailsPanel = createDetailsPanel(searchEventByNameViewModel);
         add(detailsPanel, BorderLayout.WEST);
 
-        JPanel imagePanel = createImagePanel(event);
+        JPanel imagePanel = createImagePanel(searchEventByNameViewModel);
         add(imagePanel, BorderLayout.EAST);
 
     }
 
     /**
      * Create the left-panel of the event, this contains all the details of the event.
-     * @param event
+     * @param searchEventByNameViewModel
      * @return
      */
-    private JPanel createDetailsPanel(Event event) {
+    private JPanel createDetailsPanel(SearchEventByNameViewModel searchEventByNameViewModel) {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setForeground(Color.WHITE);
@@ -57,14 +53,13 @@ public class EventView extends JPanel {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 eventController.switchToDashboardView();
 
             }
         });
 
         // Category
-        JLabel categoryLabel = new JLabel(event.getCategory().getDisplayName());
+        JLabel categoryLabel = new JLabel(searchEventByNameViewModel.EVENT.getCategory().getDisplayName());
         categoryLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
         categoryLabel.setForeground(new Color(59, 130, 246));
         categoryLabel.setOpaque(true);
@@ -76,7 +71,7 @@ public class EventView extends JPanel {
 
 
         // Name
-        JLabel nameLabel = new JLabel(event.getName());
+        JLabel nameLabel = new JLabel(searchEventByNameViewModel.EVENT.getName());
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
         nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(nameLabel);
@@ -84,7 +79,7 @@ public class EventView extends JPanel {
 
 
         // Date
-        JLabel dateLabel = new JLabel(event.getDate());
+        JLabel dateLabel = new JLabel(searchEventByNameViewModel.EVENT.getDate());
         dateLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
         dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(dateLabel);
@@ -99,7 +94,7 @@ public class EventView extends JPanel {
         mainPanel.add(Box.createVerticalStrut(12));
 
 
-        JTextArea descArea = new JTextArea(event.getDescription());
+        JTextArea descArea = new JTextArea(searchEventByNameViewModel.EVENT.getDescription());
         descArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
         descArea.setForeground(new Color(80, 80, 80));
         descArea.setBackground(Color.WHITE);
@@ -136,17 +131,17 @@ public class EventView extends JPanel {
 
     /**
      * Create the right-panel of the event, containing an image of the event.
-     * @param event
+     * @param searchEventByNameViewModel
      * @return
      */
-    private JPanel createImagePanel(Event event) {
+    private JPanel createImagePanel(SearchEventByNameViewModel searchEventByNameViewModel) {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setPreferredSize(new Dimension(500, 700));
         mainPanel.setBackground(new Color(30, 30, 30));
         // Get image from TicketMaster API (Event Entity)
 
         try {
-            URL imageUrl = new URL(event.getImageURL());
+            URL imageUrl = new URL(searchEventByNameViewModel.EVENT.getImageURL());
             ImageIcon icon = new ImageIcon(imageUrl);
             Image image = icon.getImage().getScaledInstance(500, 700, Image.SCALE_SMOOTH);
             JLabel imageLabel = new JLabel(new ImageIcon(image));
@@ -162,4 +157,9 @@ public class EventView extends JPanel {
     public String getViewName() {
         return viewName;
     }
+
+    public void setEventController(SearchEventByNameController controller) {
+        this.eventController = controller;
+    }
+
 }

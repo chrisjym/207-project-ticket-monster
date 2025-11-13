@@ -11,6 +11,9 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
+import interface_adapter.search_event_by_name.SearchEventByNameController;
+import interface_adapter.search_event_by_name.SearchEventByNamePresenter;
+import interface_adapter.search_event_by_name.SearchEventByNameViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -23,13 +26,16 @@ import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
+import use_case.search_event_by_name.SearchEventByNameInputBoundary;
+import use_case.search_event_by_name.SearchEventByNameInteractor;
+import use_case.search_event_by_name.SearchEventByNameOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
 import view.LoggedInView;
 import view.LoginView;
 import view.SignupView;
-import view.EventView;
+import view.SearchEventByNameView; // Chris Addition
 import view.ViewManager;
 
 import javax.swing.*;
@@ -57,7 +63,8 @@ public class AppBuilder {
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
-    private EventView eventView;
+    private SearchEventByNameView searchEventView;
+    private SearchEventByNameViewModel searchEventViewModel;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -84,7 +91,10 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addEventView() {
+    public AppBuilder addEventSearchView() {
+        searchEventViewModel = new SearchEventByNameViewModel();
+        searchEventView = new SearchEventByNameView(searchEventViewModel);
+        cardPanel.add(searchEventView, searchEventView.getViewName());
         return this;
     }
 
@@ -135,6 +145,25 @@ public class AppBuilder {
 
         final LogoutController logoutController = new LogoutController(logoutInteractor);
         loggedInView.setLogoutController(logoutController);
+        return this;
+    }
+
+    //CHATGPT:
+    public AppBuilder addSearchEventUseCase() {
+        // 1. Create Search Event Presenter (you'll need a DashboardViewModel)
+        final SearchEventByNameOutputBoundary searchEventOutputBoundary =
+                new SearchEventByNamePresenter(viewManagerModel, dashboardViewModel);
+
+        // 2. Create Interactor with Presenter
+        final SearchEventByNameInputBoundary searchEventInteractor =
+                new SearchEventByNameInteractor(searchEventOutputBoundary);
+
+        // 3. Create Controller with Interactor
+        SearchEventByNameController controller = new SearchEventByNameController(searchEventInteractor);
+
+        // 4. Inject Controller into EventView
+        searchEventView.setEventController(controller);
+
         return this;
     }
 

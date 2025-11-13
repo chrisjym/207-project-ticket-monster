@@ -113,7 +113,7 @@ public class EventView extends JPanel {
         // Get image from TicketMaster API (Event Entity)
 
         try {
-            URL imageUrl = new URL("API_IMAGE_URL");
+            URL imageUrl = new URL(event.getImageURL());
             ImageIcon icon = new ImageIcon(imageUrl);
             Image image = icon.getImage().getScaledInstance(500, 700, Image.SCALE_SMOOTH);
             JLabel imageLabel = new JLabel(new ImageIcon(image));
@@ -123,6 +123,6 @@ public class EventView extends JPanel {
             JLabel placeholderLabel = new JLabel("No Image :(");
             mainPanel.add(placeholderLabel, BorderLayout.CENTER);
         }
-
+        return mainPanel;
     }
 }

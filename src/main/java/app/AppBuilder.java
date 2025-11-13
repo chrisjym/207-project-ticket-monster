@@ -29,6 +29,7 @@ import use_case.signup.SignupOutputBoundary;
 import view.LoggedInView;
 import view.LoginView;
 import view.SignupView;
+import view.EventView;
 import view.ViewManager;
 
 import javax.swing.*;
@@ -56,6 +57,7 @@ public class AppBuilder {
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
+    private EventView eventView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -79,6 +81,10 @@ public class AppBuilder {
         loggedInViewModel = new LoggedInViewModel();
         loggedInView = new LoggedInView(loggedInViewModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addEventView() {
         return this;
     }
 

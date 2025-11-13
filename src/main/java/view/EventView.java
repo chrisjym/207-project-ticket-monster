@@ -2,16 +2,25 @@ package view;
 
 import javax.swing.*;
 import entity.Event;
+import interface_adapter.search_event_by_name.SearchEventByNameController;
+import interface_adapter.signup.SignupController;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
 import java.net.URL;
 
-public class EventView extends JPanel {
+public class EventView extends JPanel implements ActionListener, PropertyChangeListener {
 
+    private final String viewName = "event search";
     private final Event event;
+    private SearchEventByNameController eventController = null;
 
-    public EventView(Event event) {
+
+    public EventView(Event event, SearchEventByNameController eventController) {
         this.event = event;
+        this.eventController = eventController;
 
         this.setLayout(new BorderLayout());
 
@@ -34,6 +43,15 @@ public class EventView extends JPanel {
         backButton.setFont(new Font("SansSerif", Font.PLAIN, 13));
         backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(backButton);
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                eventController.switchToDashboardView();
+
+            }
+        });
 
         // Category
         JLabel categoryLabel = new JLabel(event.getCategory().getDisplayName());
@@ -124,5 +142,9 @@ public class EventView extends JPanel {
             mainPanel.add(placeholderLabel, BorderLayout.CENTER);
         }
         return mainPanel;
+    }
+
+    public String getViewName() {
+        return viewName;
     }
 }

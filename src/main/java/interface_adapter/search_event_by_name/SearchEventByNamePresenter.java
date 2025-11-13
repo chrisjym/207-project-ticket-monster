@@ -1,25 +1,44 @@
 package interface_adapter.search_event_by_name;
 
 import interface_adapter.ViewManagerModel;
-// Change to dashboardViewModel
-import interface_adapter.login.LoginViewModel;
-import interface_adapter.signup.SignupViewModel;
 import use_case.search_event_by_name.SearchEventByNameOutputBoundary;
+import use_case.search_event_by_name.SearchEventByNameOutputData;
 
 public class SearchEventByNamePresenter implements SearchEventByNameOutputBoundary {
-    private final SignupViewModel signupViewModel;
+
+    private final SearchEventByNameViewModel searchEventByNameViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    public SearchEventByNamePresenter(ViewManagerModel viewManagerModel, SignupViewModel signupViewModel) {
+    public SearchEventByNamePresenter(SearchEventByNameViewModel searchEventByNameViewModel,
+                                      ViewManagerModel viewManagerModel) {
+        this.searchEventByNameViewModel = searchEventByNameViewModel;
         this.viewManagerModel = viewManagerModel;
-        // Change to dashboardViewModel
-        this.signupViewModel = signupViewModel;
+    }
+
+    @Override
+    public void prepareSuccessView(SearchEventByNameOutputData outputData) {
+        SearchEventByNameState state = searchEventByNameViewModel.getState();
+        state.setEvent(outputData.getEvent());
+        state.setErrorMessage(null);
+        searchEventByNameViewModel.setState(state);
+        searchEventByNameViewModel.firePropertyChange();
+
+        viewManagerModel.setState(searchEventByNameViewModel.getViewName());
+        viewManagerModel.firePropertyChange();
+    }
+
+    @Override
+    public void prepareFailView(String errorMessage) {
+        SearchEventByNameState state = searchEventByNameViewModel.getState();
+        state.setEvent(null);
+        state.setErrorMessage(errorMessage);
+        searchEventByNameViewModel.setState(state);
+        searchEventByNameViewModel.firePropertyChange();
     }
 
     @Override
     public void switchToDashboardView() {
-        viewManagerModel.setState(signupViewModel.getViewName());
-        // Need to change this to the dashboardViewModel when finished
+        viewManagerModel.setState("dashboard"); // or whatever your dashboard view name is
         viewManagerModel.firePropertyChange();
     }
 }

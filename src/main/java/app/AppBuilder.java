@@ -148,25 +148,6 @@ public class AppBuilder {
         return this;
     }
 
-    //CHATGPT:
-    public AppBuilder addSearchEventUseCase() {
-        // 1. Create Search Event Presenter (you'll need a DashboardViewModel)
-        final SearchEventByNameOutputBoundary searchEventOutputBoundary =
-                new SearchEventByNamePresenter(viewManagerModel, dashboardViewModel);
-
-        // 2. Create Interactor with Presenter
-        final SearchEventByNameInputBoundary searchEventInteractor =
-                new SearchEventByNameInteractor(searchEventOutputBoundary);
-
-        // 3. Create Controller with Interactor
-        SearchEventByNameController controller = new SearchEventByNameController(searchEventInteractor);
-
-        // 4. Inject Controller into EventView
-        searchEventView.setEventController(controller);
-
-        return this;
-    }
-
     public JFrame build() {
         final JFrame application = new JFrame("User Login Example");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

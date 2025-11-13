@@ -20,7 +20,6 @@ public class Main {
                 .addLoginUseCase()
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
-                .addSearchEventUseCase()
                 .build();
 
         application.pack();

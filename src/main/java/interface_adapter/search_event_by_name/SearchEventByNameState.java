@@ -4,6 +4,8 @@ import entity.Event;
 
 public class SearchEventByNameState {
     private Event event = null;
+    private String errorMessage;
+
 
     public Event getEvent() {
         return event;
@@ -11,5 +13,13 @@ public class SearchEventByNameState {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

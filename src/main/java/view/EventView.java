@@ -18,6 +18,11 @@ public class EventView extends JPanel {
     private SearchEventByNameController eventController = null;
 
 
+    /**
+     * Constructor for the EventView, takes an event and returns a view of its details
+     * @param event
+     * @param eventController
+     */
     public EventView(Event event, SearchEventByNameController eventController) {
         this.event = event;
         this.eventController = eventController;
@@ -32,6 +37,11 @@ public class EventView extends JPanel {
 
     }
 
+    /**
+     * Create the left-panel of the event, this contains all the details of the event.
+     * @param event
+     * @return
+     */
     private JPanel createDetailsPanel(Event event) {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -124,6 +134,11 @@ public class EventView extends JPanel {
         return wrapper;
     }
 
+    /**
+     * Create the right-panel of the event, containing an image of the event.
+     * @param event
+     * @return
+     */
     private JPanel createImagePanel(Event event) {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setPreferredSize(new Dimension(500, 700));

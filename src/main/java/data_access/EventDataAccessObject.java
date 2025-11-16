@@ -14,7 +14,7 @@ import java.util.List;
 
 public class EventDataAccessObject {
 
-    private static final String API_KEY = "YOUR_API_KEY_HERE"; // Replace with your actual API key
+    private static final String API_KEY = "oL2pW4zAlAZvhBAhPNi5mNYvS7OsBM9J"; // Replace with your actual API key
     private static final String BASE_URL = "https://app.ticketmaster.com/discovery/v2";
     private static final String EVENTS_ENDPOINT = "/events.json";
 
@@ -104,51 +104,6 @@ public class EventDataAccessObject {
         }
     }
 
-    /**
-     * Get image URL for an event (returns the highest quality 16:9 image)
-     */
-    public String getEventImageUrl(String eventId) {
-        Event event = getEventById(eventId);
-        if (event == null) {
-            return null;
-        }
-
-        String url = BASE_URL + "/events/" + eventId + "/images.json?apikey=" + API_KEY;
-
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                return null;
-            }
-
-            String jsonResponse = response.body().string();
-            JSONArray images = new JSONArray(jsonResponse);
-
-            String bestImageUrl = null;
-            int maxWidth = 0;
-
-            for (int i = 0; i < images.length(); i++) {
-                JSONObject image = images.getJSONObject(i);
-                if (image.has("ratio") && "16_9".equals(image.getString("ratio"))) {
-                    int width = image.getInt("width");
-                    if (width > maxWidth) {
-                        maxWidth = width;
-                        bestImageUrl = image.getString("url");
-                    }
-                }
-            }
-
-            return bestImageUrl;
-
-        } catch (IOException e) {
-            System.err.println("Error fetching event images: " + e.getMessage());
-            return null;
-        }
-    }
-
     private List<Event> fetchEvents(String url) {
         List<Event> events = new ArrayList<>();
 
@@ -216,12 +171,34 @@ public class EventDataAccessObject {
                 return null;
             }
 
-            return new Event(id, name, description, category, location, startTime);
+            String imageUrl = extractImageUrl(eventJson);
+            imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkCvGKxmQiiqw4EBRsR7efhydiV7Gq4LwgFw&s";
+//
+
+            return new Event(id, name, description, category, location, startTime, imageUrl);
 
         } catch (Exception e) {
             System.err.println("Error parsing event: " + e.getMessage());
             return null;
         }
+    }
+
+    private String extractImageUrl(JSONObject eventJson) {
+        try {
+            if (eventJson.has("images")) {
+                JSONArray images = eventJson.getJSONArray("images");
+                if (images.length() > 0) {
+                    // Get the first image URL
+                    JSONObject firstImage = images.getJSONObject(1);
+                    if (firstImage.has("url")) {
+                        return firstImage.getString("url");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error extracting image URL: " + e.getMessage());
+        }
+        return "";
     }
 
     private EventCategory extractCategory(JSONObject eventJson) {

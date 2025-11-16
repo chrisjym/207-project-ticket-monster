@@ -20,4 +20,7 @@ public class SearchOutputData {
     public String getQuery() { return query; }
     public boolean isSuccess() { return success; }
     public String getMessage() { return message; }
+    public Event getEvent() {
+        return events != null && !events.isEmpty() ? events.get(0) : null;
+    }
 }

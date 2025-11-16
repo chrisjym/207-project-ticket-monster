@@ -1,6 +1,7 @@
 package app;
 
 import data_access.FileUserDataAccessObject;
+import data_access.SearchEventDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.ChangePasswordController;
@@ -11,6 +12,8 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.logout.LogoutPresenter;
+import interface_adapter.search.SearchController;
+import interface_adapter.search.SearchPresenter;
 import interface_adapter.search_event_by_name.SearchEventByNameController;
 import interface_adapter.search_event_by_name.SearchEventByNamePresenter;
 import interface_adapter.search_event_by_name.SearchEventByNameViewModel;
@@ -26,6 +29,9 @@ import use_case.login.LoginOutputBoundary;
 import use_case.logout.LogoutInputBoundary;
 import use_case.logout.LogoutInteractor;
 import use_case.logout.LogoutOutputBoundary;
+import use_case.search.SearchInputBoundary;
+import use_case.search.SearchInteractor;
+import use_case.search.SearchOutputBoundary;
 import use_case.search_event_by_name.SearchEventByNameInputBoundary;
 import use_case.search_event_by_name.SearchEventByNameInteractor;
 import use_case.search_event_by_name.SearchEventByNameOutputBoundary;
@@ -95,6 +101,43 @@ public class AppBuilder {
         searchEventViewModel = new SearchEventByNameViewModel();
         searchEventView = new SearchEventByNameView(searchEventViewModel);
         cardPanel.add(searchEventView, searchEventView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addSearchUseCase() {
+        final SearchEventDataAccessObject searchDataAccess = new SearchEventDataAccessObject();
+
+        final SearchOutputBoundary searchPresenter = new SearchPresenter(
+                searchEventViewModel,
+                viewManagerModel
+        );
+
+        final SearchInputBoundary searchInteractor = new SearchInteractor(
+                searchDataAccess,
+                searchPresenter
+        );
+
+        final SearchController searchController = new SearchController(searchInteractor);
+
+        return this;
+    }
+
+    public AppBuilder addSearchEventByNameUseCase() {
+        final SearchEventDataAccessObject searchDataAccess = new SearchEventDataAccessObject();
+
+        final SearchEventByNameOutputBoundary presenter = new SearchEventByNamePresenter(
+                searchEventViewModel,
+                viewManagerModel
+        );
+
+        final SearchEventByNameInputBoundary interactor = new SearchEventByNameInteractor(
+                searchDataAccess,
+                presenter
+        );
+
+        final SearchEventByNameController controller = new SearchEventByNameController(interactor);
+        searchEventView.setEventController(controller);
+
         return this;
     }
 

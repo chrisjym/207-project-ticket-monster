@@ -1,79 +1,72 @@
 package view;
 
 import javax.swing.*;
-
 import interface_adapter.search_event_by_name.SearchEventByNameController;
 import interface_adapter.search_event_by_name.SearchEventByNameViewModel;
+import entity.Event;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 
-public class SearchEventByNameView extends JPanel {
+public class SearchEventByNameView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "event search";
     private final SearchEventByNameViewModel searchEventByNameViewModel;
     private SearchEventByNameController eventController = null;
 
+    // Components that need to be updated
+    private JLabel categoryLabel;
+    private JLabel nameLabel;
+    private JLabel dateLabel;
+    private JLabel venueLabel;
+    private JTextArea descArea;
+    private JPanel imagePanel;
 
-    /**
-     * Constructor for the EventView, takes an event and returns a view of its details
-     * @param searchEventByNameViewModel
-     */
     public SearchEventByNameView(SearchEventByNameViewModel searchEventByNameViewModel) {
         this.searchEventByNameViewModel = searchEventByNameViewModel;
+        this.searchEventByNameViewModel.addPropertyChangeListener(this);
         this.setLayout(new BorderLayout());
 
-//        if (searchEventByNameViewModel.getEvent() == null) {
-//            JPanel emptyPanel = new JPanel();
-//            emptyPanel.setForeground(Color.WHITE);
-//
-//            JLabel emptyLabel = new JLabel("No Event Found");
-//            emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-//            emptyLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
-//            emptyPanel.add(emptyLabel);
-//            add(emptyPanel);
-//        }
-//        else {
-        JPanel detailsPanel = createDetailsPanel(searchEventByNameViewModel);
+        JPanel detailsPanel = createDetailsPanel();
         add(detailsPanel, BorderLayout.CENTER);
 
-        JPanel imagePanel = createImagePanel(searchEventByNameViewModel);
+        imagePanel = createImagePanel();
         add(imagePanel, BorderLayout.EAST);
-//        }
+
+        // Initial update with current state
+        updateView();
     }
 
-    /**
-     * Create the left-panel of the event, this contains all the details of the event.
-     * @param searchEventByNameViewModel
-     * @return
-     */
-    private JPanel createDetailsPanel(SearchEventByNameViewModel searchEventByNameViewModel) {
+    private JPanel createDetailsPanel() {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setForeground(Color.WHITE);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         mainPanel.setPreferredSize(new Dimension(400, 700));
 
-        // Back
+        // Back Button
         JButton backButton = new JButton("← Back to Events");
         backButton.setFont(new Font("SansSerif", Font.PLAIN, 13));
         backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(backButton);
         mainPanel.add(Box.createVerticalStrut(24));
 
-
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                eventController.switchToDashboardView();
+                if (eventController != null) {
+                    eventController.switchToDashboardView();
+                }
             }
         });
 
-        // Category
-        // Replace with: searchEventByNameViewModel.getEvent().getCategory().getDisplayName()
-        JLabel categoryLabel = new JLabel("Sport");
+        // Category Label
+        categoryLabel = new JLabel("Loading...");
         categoryLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
         categoryLabel.setForeground(new Color(59, 130, 246));
         categoryLabel.setOpaque(true);
@@ -83,24 +76,23 @@ public class SearchEventByNameView extends JPanel {
         mainPanel.add(categoryLabel);
         mainPanel.add(Box.createVerticalStrut(12));
 
-
-        // Name
-        // Replace with: searchEventByNameViewModel.getEvent().getName()
-        JLabel nameLabel = new JLabel("<html>Toronto Raptors <br/> vs. Lakers</html>");
+        // Name Label
+        nameLabel = new JLabel("<html>Loading Event...</html>");
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
         nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(nameLabel);
         mainPanel.add(Box.createVerticalStrut(12));
 
-
-        // Date
-        // Replace with: searchEventByNameViewModel.getEvent().getDate()
-        mainPanel.add(createRow("Date:", "November 18, 2025" ));
+        // Date Row
+        JPanel dateRow = createRow("Date:", "");
+        dateLabel = (JLabel) dateRow.getComponent(1);
+        mainPanel.add(dateRow);
         mainPanel.add(Box.createVerticalStrut(12));
 
-        // Venue
-        // Replace with: searchEventByNameViewModel.getEvent().getLocation()
-        mainPanel.add(createRow("Venue:", "Diddy's House" ));
+        // Venue Row
+        JPanel venueRow = createRow("Venue:", "");
+        venueLabel = (JLabel) venueRow.getComponent(1);
+        mainPanel.add(venueRow);
         mainPanel.add(Box.createVerticalStrut(12));
 
         JLabel descTitle = new JLabel("About this event");
@@ -110,8 +102,7 @@ public class SearchEventByNameView extends JPanel {
         mainPanel.add(descTitle);
         mainPanel.add(Box.createVerticalStrut(12));
 
-        //Replace with: searchEventByNameViewModel.getEvent().getDescription()
-        JTextArea descArea = new JTextArea("Test Description");
+        descArea = new JTextArea("Loading description...");
         descArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
         descArea.setForeground(new Color(80, 80, 80));
         descArea.setBackground(Color.WHITE);
@@ -131,11 +122,9 @@ public class SearchEventByNameView extends JPanel {
         saveButton.setBorder(BorderFactory.createLineBorder(new Color(59, 130, 246), 2));
         saveButton.setPreferredSize(new Dimension(160, 45));
         saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        saveButton.setAlignmentX(Component.LEFT_ALIGNMENT); // Change to LEFT
+        saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(saveButton);
 
-
-        // Im not sure what this does, and will have to do more research (just copied it from another source)
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -146,30 +135,35 @@ public class SearchEventByNameView extends JPanel {
         return wrapper;
     }
 
-    /**
-     * Create the right-panel of the event, containing an image of the event.
-     * @param searchEventByNameViewModel
-     * @return
-     */
-    private JPanel createImagePanel(SearchEventByNameViewModel searchEventByNameViewModel) {
+    private JPanel createImagePanel() {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setPreferredSize(new Dimension(500, 700));
         mainPanel.setBackground(new Color(30, 30, 30));
-        // Get image from TicketMaster API (Event Entity)
+
+        JLabel placeholderLabel = new JLabel("Loading...", SwingConstants.CENTER);
+        placeholderLabel.setForeground(Color.WHITE);
+        mainPanel.add(placeholderLabel, BorderLayout.CENTER);
+
+        return mainPanel;
+    }
+
+    private void updateImagePanel(String imageUrl) {
+        imagePanel.removeAll();
 
         try {
-            // Replace with: searchEventByNameViewModel.getEvent().getImageURL()
-            URL imageUrl = new URL("https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=500&h=700&fit=crop");
-            ImageIcon icon = new ImageIcon(imageUrl);
+            URL url = new URL(imageUrl);
+            ImageIcon icon = new ImageIcon(url);
             Image image = icon.getImage().getScaledInstance(500, 700, Image.SCALE_SMOOTH);
             JLabel imageLabel = new JLabel(new ImageIcon(image));
-            mainPanel.add(imageLabel, BorderLayout.CENTER);
+            imagePanel.add(imageLabel, BorderLayout.CENTER);
         } catch (Exception e) {
-            // Fallback if image doesn't load
-            JLabel placeholderLabel = new JLabel("No Image :(");
-            mainPanel.add(placeholderLabel, BorderLayout.CENTER);
+            JLabel placeholderLabel = new JLabel("No Image Available", SwingConstants.CENTER);
+            placeholderLabel.setForeground(Color.WHITE);
+            imagePanel.add(placeholderLabel, BorderLayout.CENTER);
         }
-        return mainPanel;
+
+        imagePanel.revalidate();
+        imagePanel.repaint();
     }
 
     private JPanel createRow(String category, String text) {
@@ -192,6 +186,37 @@ public class SearchEventByNameView extends JPanel {
         return row;
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        updateView();
+    }
+
+    private void updateView() {
+        Event event = searchEventByNameViewModel.getEvent();
+
+        if (event != null) {
+            // Update category
+            categoryLabel.setText(event.getCategory().getDisplayName());
+
+            // Update name
+            nameLabel.setText("<html>" + event.getName().replace(" ", "<br/>") + "</html>");
+
+            // Update date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+            dateLabel.setText(event.getStartTime().format(formatter));
+
+            // Update venue
+            venueLabel.setText(event.getLocation().getAddress());
+
+            // Update description
+            String desc = event.getDescription();
+            descArea.setText(desc.isEmpty() ? "No description available" : desc);
+
+            // Update image
+            updateImagePanel(event.getImageUrl());
+        }
+    }
+
     public String getViewName() {
         return viewName;
     }
@@ -199,5 +224,4 @@ public class SearchEventByNameView extends JPanel {
     public void setEventController(SearchEventByNameController controller) {
         this.eventController = controller;
     }
-
 }

@@ -5,6 +5,10 @@ import interface_adapter.search.SearchController;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class SearchBarView extends JPanel {
     private JTextField searchField;
@@ -69,10 +73,37 @@ public class SearchBarView extends JPanel {
         searchField.setBorder(new EmptyBorder(8, 5, 8, 5));
         searchField.setOpaque(false);
         searchField.setForeground(new Color(100, 100, 100));
+        searchField.setBackground(new Color(0, 0, 0, 0));
+
+        searchField.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                isFocused = false;
+                container.repaint();
+            }
+
+            public void focusLost(FocusEvent e) {
+                isFocused = false;
+                container.repaint();
+            }
+        });
+
+        searchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (searchController != null) {
+                    String query = searchField.getText().trim();
+                    if (!query.isEmpty()) {
+                        // Execute search with "name" as search type
+                        searchController.execute(query, "name");
+                    }
+                }
+            }
+        });
 
         container.add(searchField, BorderLayout.CENTER);
         return container;
     }
+
+
 
     public void setSearchController(SearchController controller) {
         this.searchController = controller;

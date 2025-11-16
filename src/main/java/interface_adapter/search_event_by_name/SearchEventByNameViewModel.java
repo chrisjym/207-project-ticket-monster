@@ -7,7 +7,7 @@ import interface_adapter.signup.SignupState;
 public class SearchEventByNameViewModel extends ViewModel<SearchEventByNameState> {
 
     public SearchEventByNameViewModel() {
-        super("search event");
+        super("event search");
         setState(new SearchEventByNameState());
     }
 

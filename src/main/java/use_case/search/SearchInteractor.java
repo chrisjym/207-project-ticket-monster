@@ -23,8 +23,8 @@ public class SearchInteractor implements SearchInputBoundary {
             return;
         }
 
-        Location userLocation = new Location("Toronto, ON", 43.6532, -79.3832);
-        double radiusKm = 50.0; // Default 50km radius
+        Location userLocation = inputData.getLocation();
+        double radiusKm = 50.0;
 
         // Search for events
         List<Event> events = eventDataAccess.searchEventsByName(

@@ -1,5 +1,6 @@
 package view;
 
+import entity.Location;
 import interface_adapter.search.SearchController;
 
 import javax.swing.*;
@@ -18,13 +19,15 @@ public class SearchBarView extends JPanel {
     private boolean isFocused = false;
     private String searchDescription = null;
     private SearchController searchController = null;
+    private Location location = null;
 
 
-    public SearchBarView(String text) {
+    public SearchBarView(String text, Location userLocation) {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 60));
         setOpaque(false);
         this.searchDescription = text;
+        this.location = userLocation;
         add(initComponents(searchDescription));
     }
 
@@ -92,8 +95,8 @@ public class SearchBarView extends JPanel {
                 if (searchController != null) {
                     String query = searchField.getText().trim();
                     if (!query.isEmpty()) {
-                        // Execute search with "name" as search type
-                        searchController.execute(query, "name");
+                        // Execute search with "name" as search type: currently has a default Location
+                        searchController.execute(query, "name", location);
                     }
                 }
             }

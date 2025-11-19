@@ -1,5 +1,6 @@
 package interface_adapter.search;
 
+import entity.Location;
 import use_case.search.SearchInputBoundary;
 import use_case.search.SearchInputData;
 
@@ -12,7 +13,12 @@ public class SearchController {
     }
 
     public void execute(String query, String searchType) {
-        SearchInputData inputData = new SearchInputData(query, searchType);
+        Location defaultLocation = new Location("Toronto, ON", 43.6532, -79.3832);
+        execute(query, searchType, defaultLocation);
+    }
+
+    public void execute(String query, String searchType, Location location) {
+        SearchInputData inputData = new SearchInputData(query, searchType, location);
         searchUseCaseInteractor.execute(inputData);
     }
 

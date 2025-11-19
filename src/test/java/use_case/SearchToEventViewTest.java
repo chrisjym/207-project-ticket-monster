@@ -110,7 +110,7 @@ public class SearchToEventViewTest {
         titleLabel.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
 
         // Search bar with FIXED dimensions
-        SearchBarView searchBar = new SearchBarView("Search for events...");
+        SearchBarView searchBar = new SearchBarView("Search for events...", new Location("Milwaukee, WI", 43.0389, -87.9065));
         searchBar.setSearchController(searchController);
         searchBar.setMinimumSize(new Dimension(600, 60));
         searchBar.setMaximumSize(new Dimension(600, 60));

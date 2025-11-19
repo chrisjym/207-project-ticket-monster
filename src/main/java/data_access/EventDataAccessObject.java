@@ -172,8 +172,6 @@ public class EventDataAccessObject {
             }
 
             String imageUrl = extractImageUrl(eventJson);
-            imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkCvGKxmQiiqw4EBRsR7efhydiV7Gq4LwgFw&s";
-//
 
             return new Event(id, name, description, category, location, startTime, imageUrl);
 
@@ -188,8 +186,7 @@ public class EventDataAccessObject {
             if (eventJson.has("images")) {
                 JSONArray images = eventJson.getJSONArray("images");
                 if (images.length() > 0) {
-                    // Get the first image URL
-                    JSONObject firstImage = images.getJSONObject(1);
+                    JSONObject firstImage = images.getJSONObject(3);
                     if (firstImage.has("url")) {
                         return firstImage.getString("url");
                     }

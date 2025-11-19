@@ -16,7 +16,7 @@ public class SimpleSearchBarDemo {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
 
         // Create and add your search bar
-        SearchBarView searchBar = new SearchBarView("Hello!");
+        SearchBarView searchBar = new SearchBarView("Hello!", new Location("Milwaukee, WI", 43.0389, -87.9065));
         mainPanel.add(searchBar);
 
         frame.add(mainPanel);

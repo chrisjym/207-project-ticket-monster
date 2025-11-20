@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class SaveButtonView extends JPanel {
 
@@ -22,6 +23,10 @@ public class SaveButtonView extends JPanel {
         saveButton.setBackground(Color.WHITE);
         saveButton.setBorder(BorderFactory.createLineBorder(base, 3));
         saveButton.setPreferredSize(new Dimension(160, 45));
+
+        saveButton.setContentAreaFilled(false);
+        saveButton.setOpaque(true);
+
         addActionListeners();
 
         add(saveButton);
@@ -30,6 +35,45 @@ public class SaveButtonView extends JPanel {
     }
 
     private void addActionListeners() {
+        Color base = new Color(59, 130, 246);
+        Color pressedBackground = new Color(37, 99, 235);
+
+
+        saveButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                saveButton.setBackground(base);
+                saveButton.setForeground(Color.WHITE);
+                saveButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                saveButton.setBackground(Color.WHITE);
+                saveButton.setForeground(base);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                // Visual feedback when pressed
+                saveButton.setBackground(pressedBackground);
+                saveButton.setBorder(BorderFactory.createLineBorder(pressedBackground, 2));
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                // Return to hover state if still hovering
+                if (saveButton.contains(e.getPoint())) {
+                    saveButton.setBackground(base);
+                    saveButton.setBorder(BorderFactory.createLineBorder(base, 2));
+                } else {
+                    saveButton.setBackground(Color.WHITE);
+                    saveButton.setForeground(base);
+                    saveButton.setBorder(BorderFactory.createLineBorder(base, 2));
+                }
+            }
+        });
+
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

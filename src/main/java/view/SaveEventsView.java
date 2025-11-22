@@ -202,7 +202,7 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
                     JOptionPane.YES_NO_OPTION);
 
             if (result == JOptionPane.YES_OPTION) {
-                savedEvents.remove(event);
+                saveEventInteractor.removeEvent(event);
                 refreshEventsList();
             }
         });

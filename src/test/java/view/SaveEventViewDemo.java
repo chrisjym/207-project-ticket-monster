@@ -1,5 +1,6 @@
 package view;
 
+import data_access.FileSavedEventsDataAccessObject;
 import entity.Event;
 import entity.EventCategory;
 import entity.Location;
@@ -7,17 +8,17 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.save_event.SaveEventController;
 import interface_adapter.save_event.SaveEventPresenter;
 import interface_adapter.save_event.SaveEventViewModel;
+import use_case.login.LoginUserDataAccessInterface;
 import use_case.save_event.SaveEventInteractor;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
- * Visual demo to test the SaveButtonView and SaveEventsView integration
- * Run this to see the complete save event workflow
+ * Visual demo to test the SaveButtonView and SaveEventsView integration with file persistence
+ * Run this to see the complete save event workflow with data persistence
  * WRITTEN BY GENAI for DEMO purposes only, not in final submission
  */
 public class SaveEventViewDemo {
@@ -25,16 +26,23 @@ public class SaveEventViewDemo {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // Create the main frame
-            JFrame frame = new JFrame("Save Event Feature Demo");
+            JFrame frame = new JFrame("Save Event Feature Demo (With Persistence!)");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1200, 800);
             frame.setLocationRelativeTo(null);
+
+            // Create a mock user data access with a demo user
+            MockUserDataAccess userDataAccess = new MockUserDataAccess();
+            userDataAccess.setCurrentUsername("demo_user"); // Fallback user for demo
+
+            // Create the file-based saved events DAO
+            FileSavedEventsDataAccessObject savedEventsDAO = new FileSavedEventsDataAccessObject();
 
             // Set up the architecture components
             SaveEventViewModel saveEventViewModel = new SaveEventViewModel();
             ViewManagerModel viewManagerModel = new ViewManagerModel();
             SaveEventPresenter presenter = new SaveEventPresenter(saveEventViewModel, viewManagerModel);
-            SaveEventInteractor interactor = new SaveEventInteractor(presenter);
+            SaveEventInteractor interactor = new SaveEventInteractor(presenter, savedEventsDAO, userDataAccess);
             SaveEventController controller = new SaveEventController(interactor);
 
             // Create views
@@ -62,11 +70,22 @@ public class SaveEventViewDemo {
             frame.add(mainPanel);
             frame.setVisible(true);
 
-            System.out.println("=== Save Event Demo Started ===");
+            System.out.println("=== Save Event Demo Started (With File Persistence!) ===");
+            System.out.println("Current User: demo_user");
+            System.out.println("Saved events will persist in: saved_events/demo_user_events.json");
+            System.out.println("");
             System.out.println("1. Click 'Save Event' buttons to save events");
             System.out.println("2. Try saving the same event twice to see error handling");
             System.out.println("3. Click 'View My Saved Events' to see saved events");
-            System.out.println("4. Click 'Back to Events' to return to browsing");
+            System.out.println("4. Close and reopen the app - your saved events will still be there!");
+            System.out.println("5. Click '← Back to Events' to return to browsing");
+
+            // Load and display any previously saved events
+            int savedCount = savedEventsDAO.getSavedEvents("demo_user").size();
+            if (savedCount > 0) {
+                System.out.println("");
+                System.out.println("✅ Found " + savedCount + " previously saved event(s) for demo_user!");
+            }
         });
     }
 
@@ -82,7 +101,7 @@ public class SaveEventViewDemo {
         header.setBackground(Color.WHITE);
         header.setBorder(new EmptyBorder(20, 40, 20, 40));
 
-        JLabel title = new JLabel("Browse Events");
+        JLabel title = new JLabel("Browse Events (demo_user)");
         title.setFont(new Font("Segoe UI", Font.BOLD, 28));
         title.setForeground(new Color(17, 24, 39));
 
@@ -335,5 +354,35 @@ public class SaveEventViewDemo {
                 LocalDateTime.of(2025, 11, 30, 20, 30),
                 "https://via.placeholder.com/500x700"
         );
+    }
+
+    // Mock User Data Access for demo purposes
+    private static class MockUserDataAccess implements LoginUserDataAccessInterface {
+        private String currentUsername;
+
+        @Override
+        public boolean existsByName(String identifier) {
+            return "demo_user".equals(identifier);
+        }
+
+        @Override
+        public void save(entity.User user) {
+            // Not needed for demo
+        }
+
+        @Override
+        public entity.User get(String username) {
+            return null; // Not needed for demo
+        }
+
+        @Override
+        public void setCurrentUsername(String name) {
+            this.currentUsername = name;
+        }
+
+        @Override
+        public String getCurrentUsername() {
+            return currentUsername;
+        }
     }
 }

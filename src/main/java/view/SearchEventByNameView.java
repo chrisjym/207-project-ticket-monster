@@ -26,6 +26,7 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
     private JLabel venueLabel;
     private JTextArea descArea;
     private JPanel imagePanel;
+    private SaveButtonView saveButtonView;
 
     public SearchEventByNameView(SearchEventByNameViewModel searchEventByNameViewModel) {
         this.searchEventByNameViewModel = searchEventByNameViewModel;
@@ -51,7 +52,7 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
 
         // Back Button
         JButton backButton = new JButton("← Back to Events");
-        backButton.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        backButton.setFont(new Font("SegoeUI", Font.PLAIN, 13));
         backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(backButton);
         mainPanel.add(Box.createVerticalStrut(24));
@@ -67,7 +68,7 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
 
         // Category Label
         categoryLabel = new JLabel("Loading...");
-        categoryLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
+        categoryLabel.setFont(new Font("SegoeUI", Font.BOLD, 11));
         categoryLabel.setForeground(new Color(59, 130, 246));
         categoryLabel.setOpaque(true);
         categoryLabel.setBackground(new Color(219, 234, 254));
@@ -78,7 +79,7 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
 
         // Name Label
         nameLabel = new JLabel("<html>Loading Event...</html>");
-        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
+        nameLabel.setFont(new Font("SegoeUI", Font.BOLD, 32));
         nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(nameLabel);
         mainPanel.add(Box.createVerticalStrut(12));
@@ -96,14 +97,14 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
         mainPanel.add(Box.createVerticalStrut(12));
 
         JLabel descTitle = new JLabel("About this event");
-        descTitle.setFont(new Font("SansSerif", Font.BOLD, 16));
+        descTitle.setFont(new Font("SegoeUI", Font.BOLD, 16));
         descTitle.setForeground(new Color(20, 20, 20));
         descTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(descTitle);
         mainPanel.add(Box.createVerticalStrut(12));
 
         descArea = new JTextArea("Loading description...");
-        descArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        descArea.setFont(new Font("SegoeUI", Font.PLAIN, 14));
         descArea.setForeground(new Color(80, 80, 80));
         descArea.setBackground(Color.WHITE);
         descArea.setLineWrap(true);
@@ -114,16 +115,10 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
         mainPanel.add(descArea);
         mainPanel.add(Box.createVerticalStrut(30));
 
-        JButton saveButton = new JButton("Save Event");
-        saveButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        saveButton.setFocusPainted(false);
-        saveButton.setBackground(Color.WHITE);
-        saveButton.setForeground(new Color(59, 130, 246));
-        saveButton.setBorder(BorderFactory.createLineBorder(new Color(59, 130, 246), 2));
-        saveButton.setPreferredSize(new Dimension(160, 45));
-        saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(saveButton);
+        saveButtonView = new SaveButtonView();
+        saveButtonView.setAlignmentX(Component.LEFT_ALIGNMENT);
+        saveButtonView.setEvent(searchEventByNameViewModel.getEvent());
+        mainPanel.add(saveButtonView);
 
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(null);
@@ -173,11 +168,11 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
         row.setMaximumSize(new Dimension(400, 30));
 
         JLabel title = new JLabel(category);
-        title.setFont(new Font("SansSerif", Font.BOLD, 14));
+        title.setFont(new Font("SegoeUI", Font.BOLD, 14));
         title.setForeground(new Color(50, 50, 50));
 
         JLabel description = new JLabel(text);
-        description.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        description.setFont(new Font("SegoeUI", Font.PLAIN, 14));
         description.setForeground(new Color(50, 50, 50));
 
         row.add(title);

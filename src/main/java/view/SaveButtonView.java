@@ -81,7 +81,9 @@ public class SaveButtonView extends JPanel {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                System.out.println("Got here");
                 if (saveButtonController != null && event != null) {
+                    System.out.println("YIPPEE");
                     saveButtonController.saveEvent(event);
                     saveButton.setText("Saved");
                     saveButton.setEnabled(false);

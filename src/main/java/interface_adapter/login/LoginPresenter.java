@@ -38,8 +38,8 @@ public class LoginPresenter implements LoginOutputBoundary {
         loginViewModel.setState(new LoginState());
 
         // switch to the logged in view
-        this.viewManagerModel.setState(loggedInViewModel.getViewName());
-        this.viewManagerModel.firePropertyChange();
+        viewManagerModel.setState("display local events");
+        viewManagerModel.firePropertyChange();
     }
 
     @Override

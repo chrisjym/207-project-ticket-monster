@@ -1,0 +1,123 @@
+package interface_adapter.DisplayLocalEvents;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * ViewModel for the Display Local Events use case.
+ * Stores data formatted specifically for UI display.
+ * Contains no business logic and does not depend on use case or entity logic.
+ */
+public class DisplayLocalEventsViewModel {
+
+    /**
+     * Represents a single event card to be displayed in the UI.
+     * This class contains UI-friendly data only (mostly Strings),
+     * instead of raw domain objects like LocalDateTime or Location.
+     */
+    public static class EventCard {
+        private final String id;
+        private final String name;
+        private final String dateTime;     // formatted date-time string
+        private final String address;
+        private final String category;
+        private final String distanceText; // formatted distance, e.g., "3.2 km"
+        private final String imageUrl;
+
+        public EventCard(String id,
+                         String name,
+                         String dateTime,
+                         String address,
+                         String category,
+                         String distanceText,
+                         String imageUrl) {
+            this.id = id;
+            this.name = name;
+            this.dateTime = dateTime;
+            this.address = address;
+            this.category = category;
+            this.distanceText = distanceText;
+            this.imageUrl = imageUrl;
+        }
+
+        // ====== Getters for UI ======
+
+        public String getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDateTime() {
+            return dateTime;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public String getCategory() {
+            return category;
+        }
+
+        public String getDistanceText() {
+            return distanceText;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+    }
+
+    // ====== ViewModel State ======
+
+    // A list of event cards to be displayed in the UI (already sorted by distance)
+    private List<EventCard> eventCards = new ArrayList<>();
+
+    // A message to display on successful use case execution (e.g., "Found 5 events within 10 km")
+    private String message = "";
+
+    // Error message in case something goes wrong
+    private String error = "";
+
+    // ====== Getters / Setters ======
+
+    public List<EventCard> getEventCards() {
+        return eventCards;
+    }
+
+    public void setEventCards(List<EventCard> eventCards) {
+        this.eventCards = eventCards != null ? eventCards : new ArrayList<>();
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message != null ? message : "";
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error != null ? error : "";
+    }
+
+    // ====== Helper Methods ======
+
+    /** Returns true if there are events to display. */
+    public boolean hasEvents() {
+        return !eventCards.isEmpty();
+    }
+
+    /** Returns true if there is an error message. */
+    public boolean hasError() {
+        return !error.isEmpty();
+    }
+}
+

@@ -67,7 +67,7 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
         });
 
         // Category Label
-        categoryLabel = new JLabel("Loading...");
+        categoryLabel = new JLabel("Loading");
         categoryLabel.setFont(new Font("SegoeUI", Font.BOLD, 11));
         categoryLabel.setForeground(new Color(59, 130, 246));
         categoryLabel.setOpaque(true);
@@ -135,7 +135,7 @@ public class SearchEventByNameView extends JPanel implements PropertyChangeListe
         mainPanel.setPreferredSize(new Dimension(500, 700));
         mainPanel.setBackground(new Color(30, 30, 30));
 
-        JLabel placeholderLabel = new JLabel("Loading...", SwingConstants.CENTER);
+        JLabel placeholderLabel = new JLabel("Loading", SwingConstants.CENTER);
         placeholderLabel.setForeground(Color.WHITE);
         mainPanel.add(placeholderLabel, BorderLayout.CENTER);
 

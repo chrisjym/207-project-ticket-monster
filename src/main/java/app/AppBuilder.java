@@ -6,11 +6,12 @@ import interface_adapter.event_description.EventDescriptionViewModel;
 import interface_adapter.event_description.EventDescriptionPresenter;
 import interface_adapter.event_description.EventDescriptionController;
 import use_case.event_description.*;
-import view.EventDescriptionView;
+import view.*;
 
 
 import data_access.FileUserDataAccessObject;
 import data_access.SearchEventDataAccessObject;
+import data_access.FileSavedEventsDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.ChangePasswordController;
@@ -29,6 +30,9 @@ import interface_adapter.search_event_by_name.SearchEventByNameViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.save_event.SaveEventController;
+import interface_adapter.save_event.SaveEventPresenter;
+import interface_adapter.save_event.SaveEventViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -47,11 +51,9 @@ import use_case.search_event_by_name.SearchEventByNameOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
-import view.LoggedInView;
-import view.LoginView;
-import view.SignupView;
-import view.SearchEventByNameView; // Chris Addition
-import view.ViewManager;
+import use_case.save_event.SaveEventInputBoundary;
+import use_case.save_event.SaveEventInteractor;
+import use_case.save_event.SaveEventOutputBoundary;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,7 +72,6 @@ public class AppBuilder {
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -79,6 +80,10 @@ public class AppBuilder {
     private LoginView loginView;
     private SearchEventByNameView searchEventView;
     private SearchEventByNameViewModel searchEventViewModel;
+    private SaveEventViewModel saveEventViewModel;
+    private SaveEventsView saveEventsView;
+    private SaveButtonView saveButtonView;
+
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -130,6 +135,42 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addSaveEventView() {
+        saveEventViewModel = new SaveEventViewModel();
+        saveEventsView = new SaveEventsView(saveEventViewModel);
+        cardPanel.add(saveEventsView, saveEventsView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addSaveEventUseCase() {
+        final FileSavedEventsDataAccessObject savedEventsDAO = new FileSavedEventsDataAccessObject();
+
+        final SaveEventOutputBoundary saveEventPresenter = new SaveEventPresenter(
+                saveEventViewModel,
+                viewManagerModel
+        );
+
+        final SaveEventInputBoundary saveEventInteractor = new SaveEventInteractor(
+                saveEventPresenter,
+                savedEventsDAO,
+                userDataAccessObject
+        );
+
+        final SaveEventController saveEventController = new SaveEventController(saveEventInteractor);
+
+        // Set the controller and interactor for the views
+        if (saveEventsView != null) {
+            saveEventsView.setSaveEventController(saveEventController);
+
+        }
+
+        if (saveButtonView != null) {
+            saveButtonView.setSaveEventController(saveEventController);
+        }
+
+        return this;
+    }
+
     public AppBuilder addSearchEventByNameUseCase() {
         final SearchEventDataAccessObject searchDataAccess = new SearchEventDataAccessObject();
 
@@ -148,6 +189,8 @@ public class AppBuilder {
 
         return this;
     }
+
+
 
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,

@@ -173,7 +173,7 @@ public class EventDataAccessObject {
 
             String imageUrl = extractImageUrl(eventJson);
 
-            return new Event(id, name, description, category, location, startTime, imageUrl);
+            return new Event(id, name, description, location.getAddress(), category, location, startTime, imageUrl);
 
         } catch (Exception e) {
             System.err.println("Error parsing event: " + e.getMessage());

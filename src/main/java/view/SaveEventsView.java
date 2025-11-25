@@ -23,9 +23,8 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
     private SaveEventController saveEventController = null;
     private SaveEventInteractor saveEventInteractor = null;
 
-    public SaveEventsView(SaveEventViewModel saveEventsViewModel, SaveEventInteractor saveEventInteractor) {
+    public SaveEventsView(SaveEventViewModel saveEventsViewModel) {
         this.saveEventsViewModel = saveEventsViewModel;
-        this.saveEventInteractor = saveEventInteractor;
         saveEventsViewModel.addPropertyChangeListener(this);
 
         initializeUI();
@@ -269,8 +268,16 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    public void setSaveEventInteractor(SaveEventInteractor interactor) {
+        this.saveEventInteractor = interactor;
+    }
+
     public void setSaveEventController(SaveEventController saveEventController) {
         this.saveEventController = saveEventController;
+    }
+
+    public String getViewName() {
+        return viewName;
     }
 
 }

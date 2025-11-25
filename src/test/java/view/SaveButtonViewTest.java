@@ -11,7 +11,7 @@ public class SaveButtonViewTest {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.add(new SaveButtonView());
             frame.pack();
-            frame.setLocationRelativeTo(null); // center on screen
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
     }

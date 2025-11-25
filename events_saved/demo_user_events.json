@@ -1,13 +1,1 @@
-[{
-    "imageUrl": "https://via.placeholder.com/500x700",
-    "name": "Toronto Maple Leafs vs Montreal Canadiens",
-    "description": "The greatest rivalry in hockey! Experience the intensity as the Leafs face off against the Habs in this classic Original Six matchup. Don't miss the action!",
-    "startTime": "2025-12-07T19:00",
-    "location": {
-        "address": "Scotiabank Arena, 40 Bay St, Toronto, ON",
-        "latitude": 43.6435,
-        "longitude": -79.3791
-    },
-    "id": "event-4",
-    "category": "SPORTS"
-}]
+[]

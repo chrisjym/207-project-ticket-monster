@@ -46,7 +46,8 @@ public class SaveEventViewDemo {
             SaveEventController controller = new SaveEventController(interactor);
 
             // Create views
-            SaveEventsView saveEventsView = new SaveEventsView(saveEventViewModel, interactor);
+            SaveEventsView saveEventsView = new SaveEventsView(saveEventViewModel);
+            saveEventsView.setSaveEventInteractor(interactor);
             saveEventsView.setSaveEventController(controller);
 
             // Create main panel with CardLayout for switching views
@@ -68,23 +69,6 @@ public class SaveEventViewDemo {
 
             frame.add(mainPanel);
             frame.setVisible(true);
-
-            System.out.println("=== Save Event Demo Started (With File Persistence!) ===");
-            System.out.println("Current User: demo_user");
-            System.out.println("Saved events will persist in: saved_events/demo_user_events.json");
-            System.out.println("");
-            System.out.println("1. Click 'Save Event' buttons to save events");
-            System.out.println("2. Try saving the same event twice to see error handling");
-            System.out.println("3. Click 'View My Saved Events' to see saved events");
-            System.out.println("4. Close and reopen the app - your saved events will still be there!");
-            System.out.println("5. Click '← Back to Events' to return to browsing");
-
-            // Load and display any previously saved events
-            int savedCount = savedEventsDAO.getSavedEvents("demo_user").size();
-            if (savedCount > 0) {
-                System.out.println("");
-                System.out.println("✅ Found " + savedCount + " previously saved event(s) for demo_user!");
-            }
         });
     }
 
@@ -132,13 +116,13 @@ public class SaveEventViewDemo {
         // Add sample events
         eventsContainer.add(createEventCard(createSampleEvent1(), controller));
         eventsContainer.add(Box.createVerticalStrut(20));
-        eventsContainer.add(createEventCard(createSampleEvent2(), controller));
-        eventsContainer.add(Box.createVerticalStrut(20));
-        eventsContainer.add(createEventCard(createSampleEvent3(), controller));
-        eventsContainer.add(Box.createVerticalStrut(20));
-        eventsContainer.add(createEventCard(createSampleEvent4(), controller));
-        eventsContainer.add(Box.createVerticalStrut(20));
-        eventsContainer.add(createEventCard(createSampleEvent5(), controller));
+//        eventsContainer.add(createEventCard(createSampleEvent2(), controller));
+//        eventsContainer.add(Box.createVerticalStrut(20));
+//        eventsContainer.add(createEventCard(createSampleEvent3(), controller));
+//        eventsContainer.add(Box.createVerticalStrut(20));
+//        eventsContainer.add(createEventCard(createSampleEvent4(), controller));
+//        eventsContainer.add(Box.createVerticalStrut(20));
+//        eventsContainer.add(createEventCard(createSampleEvent5(), controller));
 
         JScrollPane scrollPane = new JScrollPane(eventsContainer);
         scrollPane.setBorder(null);
@@ -296,64 +280,66 @@ public class SaveEventViewDemo {
 
     // Sample Events
     private static Event createSampleEvent1() {
+        Location location = new Location("Scotiabank Arena, 40 Bay St, Toronto, ON", 43.6435, -79.3791);
         return new Event(
                 "event-1",
                 "Toronto Raptors vs Los Angeles Lakers",
                 "An epic showdown between two NBA powerhouses. Watch the Raptors take on LeBron James and the Lakers in what promises to be an unforgettable night of basketball action!",
+                location.getAddress(),
                 EventCategory.SPORTS,
-                new Location("Scotiabank Arena, 40 Bay St, Toronto, ON", 43.6435, -79.3791),
+                location,
                 LocalDateTime.of(2025, 12, 15, 19, 30),
-                "https://via.placeholder.com/500x700"
+        "https://via.placeholder.com/500x700"
         );
     }
-
-    private static Event createSampleEvent2() {
-        return new Event(
-                "event-2",
-                "Drake: For All The Dogs World Tour",
-                "Drake brings his latest album to life with special guests and incredible production. Don't miss the 6 God performing all his hits and new tracks in his hometown!",
-                EventCategory.MUSIC,
-                new Location("Rogers Centre, 1 Blue Jays Way, Toronto, ON", 43.6414, -79.3894),
-                LocalDateTime.of(2025, 11, 28, 20, 0),
-                "https://via.placeholder.com/500x700"
-        );
-    }
-
-    private static Event createSampleEvent3() {
-        return new Event(
-                "event-3",
-                "Hamilton: An American Musical",
-                "Lin-Manuel Miranda's revolutionary story of America's founding father Alexander Hamilton. Winner of 11 Tony Awards including Best Musical. A must-see theatrical masterpiece!",
-                EventCategory.ARTS_THEATRE,
-                new Location("Princess of Wales Theatre, 300 King St W, Toronto, ON", 43.6465, -79.3914),
-                LocalDateTime.of(2026, 1, 20, 19, 30),
-                "https://via.placeholder.com/500x700"
-        );
-    }
-
-    private static Event createSampleEvent4() {
-        return new Event(
-                "event-4",
-                "Toronto Maple Leafs vs Montreal Canadiens",
-                "The greatest rivalry in hockey! Experience the intensity as the Leafs face off against the Habs in this classic Original Six matchup. Don't miss the action!",
-                EventCategory.SPORTS,
-                new Location("Scotiabank Arena, 40 Bay St, Toronto, ON", 43.6435, -79.3791),
-                LocalDateTime.of(2025, 12, 7, 19, 0),
-                "https://via.placeholder.com/500x700"
-        );
-    }
-
-    private static Event createSampleEvent5() {
-        return new Event(
-                "event-5",
-                "The Weeknd: After Hours til Dawn Tour",
-                "Experience The Weeknd's groundbreaking performance featuring state-of-the-art production, stunning visuals, and hits from 'After Hours' and 'Dawn FM'. An unforgettable night!",
-                EventCategory.MUSIC,
-                new Location("Scotiabank Arena, 40 Bay St, Toronto, ON", 43.6435, -79.3791),
-                LocalDateTime.of(2025, 11, 30, 20, 30),
-                "https://via.placeholder.com/500x700"
-        );
-    }
+//
+//    private static Event createSampleEvent2() {
+//        return new Event(
+//                "event-2",
+//                "Drake: For All The Dogs World Tour",
+//                "Drake brings his latest album to life with special guests and incredible production. Don't miss the 6 God performing all his hits and new tracks in his hometown!",
+//                EventCategory.MUSIC,
+//                new Location("Rogers Centre, 1 Blue Jays Way, Toronto, ON", 43.6414, -79.3894),
+//                LocalDateTime.of(2025, 11, 28, 20, 0),
+//                "https://via.placeholder.com/500x700"
+//        );
+//    }
+//
+//    private static Event createSampleEvent3() {
+//        return new Event(
+//                "event-3",
+//                "Hamilton: An American Musical",
+//                "Lin-Manuel Miranda's revolutionary story of America's founding father Alexander Hamilton. Winner of 11 Tony Awards including Best Musical. A must-see theatrical masterpiece!",
+//                EventCategory.ARTS_THEATRE,
+//                new Location("Princess of Wales Theatre, 300 King St W, Toronto, ON", 43.6465, -79.3914),
+//                LocalDateTime.of(2026, 1, 20, 19, 30),
+//                "https://via.placeholder.com/500x700"
+//        );
+//    }
+//
+//    private static Event createSampleEvent4() {
+//        return new Event(
+//                "event-4",
+//                "Toronto Maple Leafs vs Montreal Canadiens",
+//                "The greatest rivalry in hockey! Experience the intensity as the Leafs face off against the Habs in this classic Original Six matchup. Don't miss the action!",
+//                EventCategory.SPORTS,
+//                new Location("Scotiabank Arena, 40 Bay St, Toronto, ON", 43.6435, -79.3791),
+//                LocalDateTime.of(2025, 12, 7, 19, 0),
+//                "https://via.placeholder.com/500x700"
+//        );
+//    }
+//
+//    private static Event createSampleEvent5() {
+//        return new Event(
+//                "event-5",
+//                "The Weeknd: After Hours til Dawn Tour",
+//                "Experience The Weeknd's groundbreaking performance featuring state-of-the-art production, stunning visuals, and hits from 'After Hours' and 'Dawn FM'. An unforgettable night!",
+//                EventCategory.MUSIC,
+//                new Location("Scotiabank Arena, 40 Bay St, Toronto, ON", 43.6435, -79.3791),
+//                LocalDateTime.of(2025, 11, 30, 20, 30),
+//                "https://via.placeholder.com/500x700"
+//        );
+//    }
 
     // Mock User Data Access for demo purposes
     private static class MockUserDataAccess implements LoginUserDataAccessInterface {

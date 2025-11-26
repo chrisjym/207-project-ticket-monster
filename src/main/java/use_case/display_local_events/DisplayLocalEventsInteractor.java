@@ -54,7 +54,6 @@ public class DisplayLocalEventsInteractor implements DisplayLocalEventsInputBoun
                     .filter(event -> event.isWithinRadius(inputData.getUserLocation(), inputData.getRadiusKm()))
                     .collect(java.util.stream.Collectors.toList());
 
-            // 4. Filter by category if specified (using entity business logic)
             List<Event> filteredEvents = localEvents;
             if (inputData.hasCategoryFilter()) {
                 filteredEvents = localEvents.stream()
@@ -62,30 +61,24 @@ public class DisplayLocalEventsInteractor implements DisplayLocalEventsInputBoun
                         .collect(Collectors.toList());
             }
 
-            // 5. Sort events by distance
             List<Event> sortedEvents = filteredEvents.stream()
                     .sorted(Comparator.comparing(event ->
                             event.calculateDistanceTo(inputData.getUserLocation())))
                     .collect(Collectors.toList());
 
-            // 6. Calculate distances for each event
             Map<String, Double> eventDistances = calculateEventDistances(sortedEvents, inputData.getUserLocation());
 
-            // 7. Prepare success message
             String message = buildSuccessMessage(sortedEvents.size(), inputData);
 
-            // 8. Create output data
             DisplayLocalEventsOutputData outputData = new DisplayLocalEventsOutputData(
                     sortedEvents,
                     message,
                     eventDistances
             );
 
-            // 9. Present successful results
             outputBoundary.presentSuccess(outputData);
 
         } catch (Exception e) {
-            // 10. Handle errors gracefully
             outputBoundary.presentError("Error displaying local events: " + e.getMessage());
         }
     }

@@ -13,7 +13,6 @@ public class DisplayLocalEventsInputData {
         this.filterCategory = filterCategory;
     }
 
-    // Getter methods
     public Location getUserLocation() {
         return userLocation;
     }

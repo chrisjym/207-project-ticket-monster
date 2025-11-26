@@ -1,6 +1,7 @@
 #csc-207-project-event-discovery
 207 Final Project
 
+
 # Table of Contents
 - [Overview](#overview)
 - [Usage Guide](#guide)
@@ -13,7 +14,7 @@
 <h1></h1>
 
 # Overview:
-This project acts like an alternative to Ticketmaster, allowing users to search for local events, view them through a calendar, and saving these events into memory for viewing at later times.
+Event Gate: This project acts like an alternative to Ticketmaster, allowing users to search for local events, view them through a calendar, and saving these events into memory for viewing at later times.
 
 # TODOs
 
@@ -41,14 +42,17 @@ In order to properly use the Ticketmaster API, you must sign up to Ticketmaster'
 
 <img width="739" height="114" alt="Screenshot 2025-11-24 at 6 59 17 PM" src="https://github.com/user-attachments/assets/543518f4-4a39-4e21-8520-e2e40281e90e" />
 
-# Usage Guide:
-1. Build and run the application
-
----
-
-## How to Use
+# Usage Guide
+## Features
 
 ### Searching for Events
+
+#### Login/Signup
+1. Launch the application
+2. You will see a sign up page
+3. Sign up, or navigate to the login page to login to a pre-existing user
+4. Click the log in/sign up button
+
 
 #### Via Search Bar
 1. Launch the application

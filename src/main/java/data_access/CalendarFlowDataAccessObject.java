@@ -55,7 +55,6 @@ public class CalendarFlowDataAccessObject implements CalendarFlowDataAccessInter
         return fetchEvents(url);
     }
 
-    //Below are code form Chris's branch
     private List<Event> fetchEvents(String url) {
         List<Event> events = new ArrayList<>();
 
@@ -125,7 +124,7 @@ public class CalendarFlowDataAccessObject implements CalendarFlowDataAccessInter
 
             String imageUrl = extractImageUrl(eventJson);
 
-            return new Event(id, name, description, category, location, startTime, imageUrl);
+            return new Event(id, name, description,location.getAddress() ,category, location, startTime, imageUrl);
 
         } catch (Exception e) {
             System.err.println("Error parsing event: " + e.getMessage());

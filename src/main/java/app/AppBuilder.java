@@ -10,6 +10,9 @@ import view.*;
 
 
 import data_access.FileUserDataAccessObject;
+import entity.Location;
+import data_access.EventDataAccessObject;
+import data_access.TicketmasterEventRepositoryAdapter;
 import data_access.CalendarFlowDataAccessObject;
 import data_access.SearchEventDataAccessObject;
 import data_access.FileSavedEventsDataAccessObject;
@@ -41,6 +44,11 @@ import use_case.calendarFlow.CalendarFlowDataAccessInterface;
 import interface_adapter.save_event.SaveEventController;
 import interface_adapter.save_event.SaveEventPresenter;
 import interface_adapter.save_event.SaveEventViewModel;
+
+import interface_adapter.displaylocalevents.DisplayLocalEventsController;
+import interface_adapter.displaylocalevents.DisplayLocalEventsPresenter;
+import interface_adapter.displaylocalevents.DisplayLocalEventsViewModel;
+
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -60,6 +68,16 @@ import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
 import view.*;
+
+import use_case.display_local_events.DisplayLocalEventsInputBoundary;
+import use_case.display_local_events.DisplayLocalEventsInteractor;
+import use_case.display_local_events.DisplayLocalEventsOutputBoundary;
+
+import view.LoggedInView;
+import view.LoginView;
+import view.SignupView;
+import view.ViewManager;
+import view.DisplayLocalEventsView;
 import use_case.save_event.SaveEventInputBoundary;
 import use_case.save_event.SaveEventInteractor;
 import use_case.save_event.SaveEventOutputBoundary;
@@ -80,7 +98,17 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
+    // set which data access implementation to use, can be any
+    // of the classes from the data_access package
+
+    // DAO version using local file storage
+    final FileUserDataAccessObject userDataAccessObject =
+            new FileUserDataAccessObject("users.csv", userFactory);
+
+    // DAO version using a shared external database
+    // final DBUserDataAccessObject userDataAccessObject =
+    //        new DBUserDataAccessObject(userFactory);
+
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
@@ -97,6 +125,9 @@ public class AppBuilder {
     private CalendarFlowViewModel calendarFlowViewModel;
     private CalendarView calendarView;
     private EventListByDateView eventListByDateView;
+
+    private DisplayLocalEventsViewModel displayLocalEventsViewModel;
+    private DisplayLocalEventsView displayLocalEventsView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -138,6 +169,14 @@ public class AppBuilder {
 
         return this;
     }
+
+    public AppBuilder addDisplayLocalEventsView() {
+        displayLocalEventsViewModel = new DisplayLocalEventsViewModel();
+        displayLocalEventsView = new DisplayLocalEventsView(displayLocalEventsViewModel);
+        cardPanel.add(displayLocalEventsView, displayLocalEventsView.getViewName());
+        return this;
+    }
+
 
     public AppBuilder addEventSearchView() {
         searchEventViewModel = new SearchEventByNameViewModel();
@@ -282,6 +321,32 @@ public class AppBuilder {
 
         return this;
     }
+
+
+    public AppBuilder addDisplayLocalEventsUseCase() {
+        EventDataAccessObject dao = new EventDataAccessObject();
+
+        Location defaultCenter = new Location("Toronto, ON", 43.6532, -79.3832);
+        double defaultRadiusKm = 50.0;
+
+        TicketmasterEventRepositoryAdapter eventRepository =
+                new TicketmasterEventRepositoryAdapter(dao, defaultCenter, defaultRadiusKm);
+
+        DisplayLocalEventsOutputBoundary outputBoundary =
+                new DisplayLocalEventsPresenter(displayLocalEventsViewModel);
+
+        DisplayLocalEventsInputBoundary interactor =
+                new DisplayLocalEventsInteractor(eventRepository, outputBoundary);
+
+        DisplayLocalEventsController controller =
+                new DisplayLocalEventsController(interactor);
+
+
+        displayLocalEventsView.setController(controller);
+
+        return this;
+    }
+
 
     public AppBuilder addEventDescriptionView() {
         eventDescriptionViewModel = new EventDescriptionViewModel();

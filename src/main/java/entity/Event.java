@@ -28,7 +28,6 @@ public class Event {
                  LocalDateTime startTime,
                  String imageUrl) {
 
-        // --- Basic validation ---
 
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("Event ID cannot be null or empty");

@@ -12,7 +12,7 @@ import entity.Location;
 
 
 public class  CalendarView extends JPanel implements ActionListener {
-    private final String viewName = "Calendar View";
+    private final String viewName = "calendar view";
     private final JLabel monthYearLabel = new JLabel("", SwingConstants.CENTER);
     private final JButton previousMonthButton = new JButton("◀");
     private final JButton nextMonthButton = new JButton("▶");

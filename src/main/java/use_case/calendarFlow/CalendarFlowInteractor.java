@@ -9,7 +9,7 @@ public class CalendarFlowInteractor implements CalendarFlowInputBoundary {
     private final CalendarFlowDataAccessInterface calendarFlowDataAccess;
     private final CalendarFlowOutputBoundary presenter;
 
-    CalendarFlowInteractor(CalendarFlowDataAccessInterface calendarFlowDataAccess,
+    public CalendarFlowInteractor(CalendarFlowDataAccessInterface calendarFlowDataAccess,
                            CalendarFlowOutputBoundary calendarFlowOutputBoundary) {
         this.calendarFlowDataAccess = calendarFlowDataAccess;
         this.presenter = calendarFlowOutputBoundary;
@@ -27,18 +27,22 @@ public class CalendarFlowInteractor implements CalendarFlowInputBoundary {
             return;
         }
 
-        List<Event> events = calendarFlowDataAccess.getEventsByDate(
-                inputData.getSelectedDate(),
-                inputData.getUserLocation(),
-                inputData.getRadiusKm()
-        );
+        try {
+            List<Event> events = calendarFlowDataAccess.getEventsByDate(
+                    inputData.getSelectedDate(),
+                    inputData.getUserLocation(),
+                    inputData.getRadiusKm()
+            );
 
-        LocalDate date = inputData.getSelectedDate();
-        if (events == null || events.isEmpty()) {
-            presenter.prepareFailView("No events found for " + date);
-        } else {
-            CalendarFlowOutputData outputData = new CalendarFlowOutputData(date, events);
-            presenter.prepareSuccessView(outputData);
+            LocalDate date = inputData.getSelectedDate();
+            if (events == null || events.isEmpty()) {
+                presenter.prepareFailView("No events found for " + date);
+            } else {
+                CalendarFlowOutputData outputData = new CalendarFlowOutputData(date, events);
+                presenter.prepareSuccessView(outputData);
+            }
+        } catch (Exception e) {
+            presenter.prepareFailView("Error fetching events: " + e.getMessage());
         }
     }
 

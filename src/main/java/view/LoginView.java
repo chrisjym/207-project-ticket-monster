@@ -41,7 +41,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         JPanel leftPanel = createBrandPanel();
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setBorder(BorderFactory.createEmptyBorder(100, 50, 0, 50));
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(100, 0, 0, 0));
 
         final JLabel title = new JLabel("Login Screen");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);

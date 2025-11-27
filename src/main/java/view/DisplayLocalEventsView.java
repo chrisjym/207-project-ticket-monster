@@ -1,6 +1,7 @@
 package view;
 
 import entity.Location;
+import interface_adapter.ViewManagerModel;
 import interface_adapter.search.SearchController;
 import interface_adapter.display_local_events.DisplayLocalEventsController;
 import interface_adapter.display_local_events.DisplayLocalEventsViewModel;
@@ -10,45 +11,39 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class DisplayLocalEventsView extends JPanel {
+public class DisplayLocalEventsView extends JPanel implements PropertyChangeListener {
 
     private DisplayLocalEventsController controller;
     private final DisplayLocalEventsViewModel viewModel;
-
     private final String viewName = "display local events";
 
     private final JLabel appNameLabel = new JLabel("Dashboard");
-
-    private final JComboBox<String> cityBox =
-            new JComboBox<>(new String[]{"Toronto", "Montreal", "New York"});
+    private final JComboBox<String> cityBox = new JComboBox<>(new String[]{"Toronto", "Montreal", "New York"});
     private final JButton searchButton = new JButton("Search");
-
-    private final JComboBox<String> categoryBox =
-            new JComboBox<>(new String[]{"ALL", "Music", "Sports", "Arts & Theatre", "Film"});
-    private final JComboBox<String> sortBox =
-            new JComboBox<>(new String[]{"Distance", "Date", "Name"});
-
+    private final JComboBox<String> categoryBox = new JComboBox<>(new String[]{"ALL", "Music", "Sports", "Arts & Theatre", "Film"});
+    private final JComboBox<String> sortBox = new JComboBox<>(new String[]{"Distance", "Date", "Name"});
     private SearchBarView searchBarView;
-
     private final JButton calendarButton = new JButton("Calendar");
     private final JButton logoutButton = new JButton("Logout");
     private final JButton savedEventsButton = new JButton("Saved Events");
-
     private final JPanel cardsContainer = new JPanel();
     private final JScrollPane cardsScrollPane;
-    private final JLabel emptyStateLabel =
-            new JLabel("Choose a location and click search to see local events.", SwingConstants.CENTER);
-
+    private final JLabel emptyStateLabel = new JLabel("Choose a location and click search to see local events.", SwingConstants.CENTER);
     private static final double DEFAULT_RADIUS_KM = 1000.0;
+    private ViewManagerModel viewManagerModel;
 
     public DisplayLocalEventsView(DisplayLocalEventsViewModel viewModel) {
         this.viewModel = viewModel;
+
+        this.viewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -59,19 +54,26 @@ public class DisplayLocalEventsView extends JPanel {
 
         cardsContainer.setBorder(new EmptyBorder(10, 10, 10, 10));
         cardsContainer.setBackground(new Color(245, 247, 250));
+
         cardsScrollPane = new JScrollPane(cardsContainer);
         cardsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
         add(cardsScrollPane, BorderLayout.CENTER);
 
         renderEmptyState();
 
-        sortBox.addActionListener(e -> renderEvents());
+        searchButton.addActionListener(e -> onSearch());
 
+        sortBox.addActionListener(e -> renderEvents());
         calendarButton.addActionListener(e ->
                 JOptionPane.showMessageDialog(this, "Calendar UI not implemented yet."));
         logoutButton.addActionListener(e ->
                 JOptionPane.showMessageDialog(this, "Logout / Login UI not implemented yet."));
     }
+
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
+    }
+
 
     public String getViewName() {
         return viewName;
@@ -79,6 +81,48 @@ public class DisplayLocalEventsView extends JPanel {
 
     public void setController(DisplayLocalEventsController controller) {
         this.controller = controller;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("state".equals(evt.getPropertyName())) {
+            renderEvents();
+        }
+    }
+
+
+    public void addViewListener(PropertyChangeListener listener) {
+        this.viewModel.addPropertyChangeListener(listener);
+    }
+
+
+    public void updateFromLocation(Location location, double radiusKm) {
+        if (controller != null && location != null) {
+            String category = (String) categoryBox.getSelectedItem();
+            controller.display(location, radiusKm, category);
+
+            viewModel.updateSearchParams(
+                    location.getAddress(),
+                    category != null ? category : "ALL",
+                    radiusKm
+            );
+        }
+    }
+
+    public void updateFromCategory(String category) {
+        if (category != null) {
+            categoryBox.setSelectedItem(category);
+            onSearch();
+        }
+    }
+
+
+    public Location getCurrentLocationForOthers() {
+        return getCurrentLocation();
+    }
+
+    public DisplayLocalEventsViewModel getViewModel() {
+        return this.viewModel;
     }
 
     private JPanel buildTopBar() {
@@ -92,45 +136,34 @@ public class DisplayLocalEventsView extends JPanel {
 
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         centerPanel.setOpaque(false);
-
         JLabel locationLabel = new JLabel("Location:");
         locationLabel.setForeground(Color.WHITE);
         centerPanel.add(locationLabel);
-
         cityBox.setPreferredSize(new Dimension(130, 24));
         centerPanel.add(cityBox);
-
         styleTopBarButton(searchButton);
         centerPanel.add(searchButton);
-
         topBar.add(centerPanel, BorderLayout.CENTER);
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         rightPanel.setOpaque(false);
-
         JLabel categoryLabel = new JLabel("Category:");
         categoryLabel.setForeground(Color.WHITE);
         rightPanel.add(categoryLabel);
-
         categoryBox.setPreferredSize(new Dimension(140, 24));
         rightPanel.add(categoryBox);
-
         JLabel sortLabel = new JLabel("Sorting by:");
         sortLabel.setForeground(Color.WHITE);
         rightPanel.add(sortLabel);
-
         sortBox.setPreferredSize(new Dimension(120, 24));
         rightPanel.add(sortBox);
-
         JLabel nameSearchLabel = new JLabel("Search by name:");
         nameSearchLabel.setForeground(Color.WHITE);
         rightPanel.add(nameSearchLabel);
-
         Location defaultLocation = getCurrentLocation();
         searchBarView = new SearchBarView("Search events...", defaultLocation);
         searchBarView.setPreferredSize(new Dimension(200, 40));
         rightPanel.add(searchBarView);
-
         topBar.add(rightPanel, BorderLayout.EAST);
 
         return topBar;
@@ -173,21 +206,18 @@ public class DisplayLocalEventsView extends JPanel {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+
     private void onSearch() {
         if (controller == null) {
-            JOptionPane.showMessageDialog(this,
-                    "Controller not initialized.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Controller not initialized.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         String selectedCity = (String) cityBox.getSelectedItem();
         if (selectedCity == null) {
-            JOptionPane.showMessageDialog(this,
-                    "Please select a location.",
-                    "Input required",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please select a location.",
+                    "Input required", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -207,7 +237,12 @@ public class DisplayLocalEventsView extends JPanel {
 
         String category = (String) categoryBox.getSelectedItem();
         controller.display(userLoc, DEFAULT_RADIUS_KM, category);
-        renderEvents();
+
+        viewModel.updateSearchParams(
+                selectedCity,
+                category != null ? category : "ALL",
+                DEFAULT_RADIUS_KM
+        );
     }
 
     private void renderEmptyState() {
@@ -233,15 +268,16 @@ public class DisplayLocalEventsView extends JPanel {
             renderEmptyState();
             return;
         } else {
-            List<DisplayLocalEventsViewModel.EventCard> cards =
-                    new ArrayList<>(viewModel.getEventCards());
-
+            List<DisplayLocalEventsViewModel.EventCard> cards = new ArrayList<>(viewModel.getEventCards());
             String sortBy = (String) sortBox.getSelectedItem();
+
             if ("Name".equalsIgnoreCase(sortBy)) {
-                cards.sort(Comparator.comparing(DisplayLocalEventsViewModel.EventCard::getName,
+                cards.sort(Comparator.comparing(
+                        DisplayLocalEventsViewModel.EventCard::getName,
                         String.CASE_INSENSITIVE_ORDER));
             } else if ("Date".equalsIgnoreCase(sortBy)) {
-                cards.sort(Comparator.comparing(DisplayLocalEventsViewModel.EventCard::getDateTime));
+                cards.sort(Comparator.comparing(
+                        DisplayLocalEventsViewModel.EventCard::getDateTime));
             } else {
                 cards.sort(Comparator.comparingDouble(this::parseDistance));
             }
@@ -296,7 +332,6 @@ public class DisplayLocalEventsView extends JPanel {
 
         JLabel pictureLabel = new JLabel("", SwingConstants.CENTER);
         pictureLabel.setPreferredSize(new Dimension(200, 110));
-
         ImageIcon icon = loadImageIcon(cardData.getImageUrl(), 200, 110);
         if (icon != null) {
             pictureLabel.setIcon(icon);
@@ -304,7 +339,6 @@ public class DisplayLocalEventsView extends JPanel {
             pictureLabel.setText("No Image");
             pictureLabel.setForeground(new Color(150, 150, 150));
         }
-
         card.add(pictureLabel, BorderLayout.NORTH);
 
         JPanel textPanel = new JPanel();
@@ -314,13 +348,10 @@ public class DisplayLocalEventsView extends JPanel {
 
         JLabel nameLabel = new JLabel(cardData.getName());
         nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD, 13f));
-
         JLabel addressLabel = new JLabel(cardData.getAddress());
         addressLabel.setForeground(new Color(100, 100, 100));
-
         JLabel dateLabel = new JLabel(cardData.getDateTime());
         dateLabel.setForeground(new Color(120, 120, 120));
-
         JLabel distanceLabel = new JLabel(cardData.getDistanceText());
         distanceLabel.setForeground(new Color(33, 150, 243));
 
@@ -333,7 +364,6 @@ public class DisplayLocalEventsView extends JPanel {
         textPanel.add(distanceLabel);
 
         card.add(textPanel, BorderLayout.CENTER);
-
         return card;
     }
 

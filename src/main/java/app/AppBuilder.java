@@ -48,6 +48,7 @@ import interface_adapter.save_event.SaveEventViewModel;
 import interface_adapter.display_local_events.DisplayLocalEventsController;
 import interface_adapter.display_local_events.DisplayLocalEventsPresenter;
 import interface_adapter.display_local_events.DisplayLocalEventsViewModel;
+import interface_adapter.ViewManagerModel;
 
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
@@ -178,6 +179,7 @@ public class AppBuilder {
         displayLocalEventsView = new DisplayLocalEventsView(displayLocalEventsViewModel);
         cardPanel.add(displayLocalEventsView, displayLocalEventsView.getViewName());
         return this;
+
     }
 
 
@@ -334,7 +336,7 @@ public class AppBuilder {
                 new TicketmasterEventRepositoryAdapter(dao, defaultCenter, defaultRadiusKm);
 
         DisplayLocalEventsOutputBoundary outputBoundary =
-                new DisplayLocalEventsPresenter(displayLocalEventsViewModel);
+                new DisplayLocalEventsPresenter(displayLocalEventsViewModel, viewManagerModel);
 
         DisplayLocalEventsInputBoundary interactor =
                 new DisplayLocalEventsInteractor(eventRepository, outputBoundary);

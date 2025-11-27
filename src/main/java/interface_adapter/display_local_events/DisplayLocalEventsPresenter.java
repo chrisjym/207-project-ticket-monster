@@ -1,29 +1,23 @@
 package interface_adapter.display_local_events;
 
 import entity.Event;
+import interface_adapter.ViewManagerModel;
 import use_case.display_local_events.DisplayLocalEventsOutputBoundary;
 import use_case.display_local_events.DisplayLocalEventsOutputData;
-
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Presenter for the Display Local Events use case.
- * This class implements the OutputBoundary and is responsible for:
- * - Transforming raw use case output data (domain objects) into a UI-friendly ViewModel.
- * - Formatting dates, distances, and messages for display.
- */
 public class DisplayLocalEventsPresenter implements DisplayLocalEventsOutputBoundary {
-
     private final DisplayLocalEventsViewModel viewModel;
+    private final ViewManagerModel viewManagerModel;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    private final DateTimeFormatter dateTimeFormatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-    public DisplayLocalEventsPresenter(DisplayLocalEventsViewModel viewModel) {
+    public DisplayLocalEventsPresenter(DisplayLocalEventsViewModel viewModel,
+                                       ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
+        this.viewManagerModel = viewManagerModel;
     }
 
     @Override
@@ -38,17 +32,15 @@ public class DisplayLocalEventsPresenter implements DisplayLocalEventsOutputBoun
                 distanceText = String.format("%.1f km", distance);
             }
 
-            DisplayLocalEventsViewModel.EventCard card =
-                    new DisplayLocalEventsViewModel.EventCard(
-                            event.getId(),
-                            event.getName(),
-                            event.getStartTime().format(dateTimeFormatter),
-                            event.getLocation().getAddress(),
-                            event.getCategory().getDisplayName(),
-                            distanceText,
-                            event.getImageUrl()
-                    );
-
+            DisplayLocalEventsViewModel.EventCard card = new DisplayLocalEventsViewModel.EventCard(
+                    event.getId(),
+                    event.getName(),
+                    event.getStartTime().format(dateTimeFormatter),
+                    event.getLocation().getAddress(),
+                    event.getCategory().getDisplayName(),
+                    distanceText,
+                    event.getImageUrl()
+            );
             cards.add(card);
         }
 
@@ -56,14 +48,17 @@ public class DisplayLocalEventsPresenter implements DisplayLocalEventsOutputBoun
         viewModel.setMessage(outputData.getMessage());
         viewModel.setError("");
 
+        viewManagerModel.setState(viewModel.getViewName());
+        viewManagerModel.firePropertyChange();
     }
 
     @Override
     public void presentError(String errorMessage) {
-
         viewModel.setEventCards(List.of());
         viewModel.setMessage("");
         viewModel.setError(errorMessage != null ? errorMessage : "Unknown error");
 
+        viewManagerModel.setState(viewModel.getViewName());
+        viewManagerModel.firePropertyChange();
     }
 }

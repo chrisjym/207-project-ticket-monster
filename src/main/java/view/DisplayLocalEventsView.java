@@ -79,9 +79,6 @@ public class DisplayLocalEventsView extends JPanel {
 
     public void setController(DisplayLocalEventsController controller) {
         this.controller = controller;
-        searchButton.addActionListener(e -> onSearch());
-        savedEventsButton.addActionListener(e ->
-                JOptionPane.showMessageDialog(this, "TODO: go to Saved Events view"));
     }
 
     private JPanel buildTopBar() {

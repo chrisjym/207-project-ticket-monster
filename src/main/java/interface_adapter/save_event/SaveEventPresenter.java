@@ -32,7 +32,7 @@ public class SaveEventPresenter implements SaveEventOutputBoundary {
 
     @Override
     public void switchToDashboardView() {
-        viewManagerModel.setState("search"); // or whatever the dashboard view name is
+        viewManagerModel.setState("display local events"); // or whatever the dashboard view name is
         viewManagerModel.firePropertyChange();
     }
 

@@ -299,6 +299,8 @@ public class AppBuilder {
                 new CalendarFlowInteractor(calendarGateway, calendarOutputBoundary);
         CalendarFlowController calendarController = new CalendarFlowController(calendarInteractor);
         calendarView.setEventController(calendarController);
+        eventListByDateView.setController(calendarController);
+
 
         return this;
     }

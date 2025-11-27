@@ -36,6 +36,7 @@ public class EventListByDateViewTest {
                 "1",
                 "Toronto Maple Leafs vs Boston Bruins",
                 "Exciting hockey game",
+                "Demo Address 1",
                 EventCategory.SPORTS,
                 location1,
                 LocalDateTime.of(2024, 11, 22, 19, 0),
@@ -47,6 +48,7 @@ public class EventListByDateViewTest {
                 "2",
                 "Drake Concert",
                 "Live music performance",
+                "Demo Address 2",
                 EventCategory.MUSIC,
                 location2,
                 LocalDateTime.of(2024, 11, 22, 20, 30),
@@ -58,6 +60,7 @@ public class EventListByDateViewTest {
                 "3",
                 "Comedy Night",
                 "Stand-up comedy show",
+                "Demo Address 3",
                 EventCategory.ARTS_THEATRE,
                 location3,
                 LocalDateTime.of(2024, 11, 22, 21, 0),
@@ -131,21 +134,6 @@ public class EventListByDateViewTest {
     }
 
     @Test
-    public void testBackButtonAction() {
-        // Test that back button action can be set
-        boolean[] actionPerformed = {false};
-
-        view.setBackButtonAction(e -> {
-            actionPerformed[0] = true;
-        });
-
-        // Action should not be performed yet
-        assertFalse(actionPerformed[0]);
-
-        // Note: Actually clicking the button would require UI testing framework
-    }
-
-    @Test
     public void testMultipleStateUpdates() {
         // First update - with events
         CalendarFlowState state1 = new CalendarFlowState();
@@ -193,5 +181,4 @@ public class EventListByDateViewTest {
             frame.setVisible(true);
         });
     }
-
 }

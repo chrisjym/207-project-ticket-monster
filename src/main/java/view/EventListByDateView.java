@@ -9,15 +9,17 @@ import java.util.Locale;
 import javax.swing.border.EmptyBorder;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import interface_adapter.calendarFlow.CalendarFlowViewModel;
 
 import entity.Event;
+import interface_adapter.calendarFlow.CalendarFlowViewModel;
+import interface_adapter.calendarFlow.CalendarFlowController;
 import interface_adapter.calendarFlow.CalendarFlowState;
 
 
 public class EventListByDateView extends JPanel implements PropertyChangeListener {
     private final String viewName = "event list by date";
     private CalendarFlowViewModel calendarFlowViewModel;
+    private CalendarFlowController calendarFlowController;
 
     private final JLabel titleLabel = new JLabel("Events", SwingConstants.CENTER);
     private final JLabel dateLabel = new JLabel("", SwingConstants.CENTER);
@@ -49,6 +51,10 @@ public class EventListByDateView extends JPanel implements PropertyChangeListene
 
     }
 
+    public void setController(CalendarFlowController controller) {
+        this.calendarFlowController = controller;
+    }
+
     private JPanel buildTopPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -64,6 +70,13 @@ public class EventListByDateView extends JPanel implements PropertyChangeListene
                 )
         );
         backButton.setFont(new Font(textFont, Font.PLAIN, 12));
+        backButton.addActionListener(e -> {
+            System.out.println("back button pressed");
+            if (calendarFlowController != null) {
+                calendarFlowController.switchToDashboardView();
+            }
+        });
+
         topPanel.add(backButton, BorderLayout.WEST);
 
         JPanel centerPanel = new JPanel();
@@ -217,18 +230,4 @@ public class EventListByDateView extends JPanel implements PropertyChangeListene
         public String getViewName() {
         return viewName;
     }
-
-    /**
-     * Sets the action for the back button
-     * @param listener the action listener
-     * implement by i.e. eventListView.setBackButtonAction(e -> viewManager.show("view name"));
-     */
-    public void setBackButtonAction(java.awt.event.ActionListener listener) {
-        // Remove existing listeners
-        for (var l : backButton.getActionListeners()) {
-            backButton.removeActionListener(l);
-        }
-        backButton.addActionListener(listener);
-    }
-
 }

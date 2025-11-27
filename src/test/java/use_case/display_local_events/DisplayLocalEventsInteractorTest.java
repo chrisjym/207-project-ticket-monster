@@ -99,6 +99,7 @@ public class DisplayLocalEventsInteractorTest {
 
         Event nearMusic = new Event(
                 "1", "Near Music", "desc",
+                "Demo Address",
                 EventCategory.MUSIC,
                 near,
                 LocalDateTime.now(),
@@ -107,6 +108,7 @@ public class DisplayLocalEventsInteractorTest {
 
         Event farSports = new Event(
                 "2", "Far Sports", "desc",
+                "Demo Address 2",
                 EventCategory.SPORTS,
                 far,
                 LocalDateTime.now(),

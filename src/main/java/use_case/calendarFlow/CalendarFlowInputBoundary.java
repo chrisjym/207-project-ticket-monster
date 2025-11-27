@@ -8,9 +8,8 @@ public interface CalendarFlowInputBoundary {
 
     void execute(CalendarFlowInputData inputData);
 
-//    //to implement later
-//    /**
-//     * Switch to the Dashboard View.
-//     */
-//    void switchToDashboardView();
+    /**
+     * Switch to the Dashboard View.
+     */
+    void switchToDashboardView();
 }

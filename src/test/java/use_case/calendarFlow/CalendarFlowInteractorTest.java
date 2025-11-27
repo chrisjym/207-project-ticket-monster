@@ -193,6 +193,7 @@ public class CalendarFlowInteractorTest {
                     "1",
                     "Toronto Maple Leafs vs Boston Bruins",
                     "Hockey game",
+                    "Address",
                     EventCategory.SPORTS,
                     loc1,
                     LocalDateTime.of(2024, 11, 22, 19, 0),
@@ -204,6 +205,7 @@ public class CalendarFlowInteractorTest {
                     "2",
                     "Drake Concert",
                     "Music concert",
+                    "toronto",
                     EventCategory.MUSIC,
                     loc2,
                     LocalDateTime.of(2024, 11, 22, 20, 30),
@@ -215,6 +217,7 @@ public class CalendarFlowInteractorTest {
                     "3",
                     "Comedy Night",
                     "Comedy show",
+                    "toronto2",
                     EventCategory.ARTS_THEATRE,
                     loc3,
                     LocalDateTime.of(2024, 11, 22, 21, 0),
@@ -229,6 +232,13 @@ public class CalendarFlowInteractorTest {
         }
     }
 
+    @Test
+    public void testSwitchToDashboardViewDelegatesToPresenter() {
+        assertFalse(mockPresenter.isSwitchToDashboardViewCalled());
+        interactor.switchToDashboardView();
+        assertTrue(mockPresenter.isSwitchToDashboardViewCalled());
+    }
+
     /**
      * Mock implementation of CalendarFlowOutputBoundary for testing.
      */
@@ -237,6 +247,8 @@ public class CalendarFlowInteractorTest {
         private boolean failViewCalled = false;
         private CalendarFlowOutputData outputData;
         private String errorMessage;
+        private boolean switchToDashboardViewCalled = false; // NEW
+
 
         @Override
         public void prepareSuccessView(CalendarFlowOutputData outputData) {
@@ -258,6 +270,15 @@ public class CalendarFlowInteractorTest {
             return failViewCalled;
         }
 
+        @Override
+        public void switchToDashboardView() { // NEW
+            this.switchToDashboardViewCalled = true; // NEW
+        }
+
+        public boolean isSwitchToDashboardViewCalled() { // NEW
+            return switchToDashboardViewCalled;
+        }
+
         public CalendarFlowOutputData getOutputData() {
             return outputData;
         }
@@ -269,6 +290,7 @@ public class CalendarFlowInteractorTest {
         public void reset() {
             successViewCalled = false;
             failViewCalled = false;
+            switchToDashboardViewCalled = false;
             outputData = null;
             errorMessage = null;
         }

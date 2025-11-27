@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 import interface_adapter.calendarFlow.CalendarFlowController;
+import interface_adapter.ViewManagerModel;
 import entity.Location;
 
 
@@ -23,12 +24,18 @@ public class  CalendarView extends JPanel implements ActionListener {
     private String textFormat = "SegoeUI";
 
     private CalendarFlowController calendarFlowController;
+    private ViewManagerModel viewManagerModel;
     private Location userLocation;
     private double searchRadiusKm = 50.0; //default
 
     public void setEventController(CalendarFlowController controller) {
         this.calendarFlowController = controller;
     }
+
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
+    }
+
 
     public void setUserLocation(Location location) {
         this.userLocation = location;
@@ -55,10 +62,23 @@ public class  CalendarView extends JPanel implements ActionListener {
                 }
         );
 
+        JButton backButton = new JButton("← Back");
+        backButton.addActionListener(e -> {
+            if (viewManagerModel != null) {
+                viewManagerModel.setState("display local events");
+                viewManagerModel.firePropertyChange();
+            }
+        });
+
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(previousMonthButton, BorderLayout.WEST);
-        topPanel.add(monthYearLabel, BorderLayout.CENTER);
-        topPanel.add(nextMonthButton, BorderLayout.EAST);
+        topPanel.add(backButton, BorderLayout.WEST);
+
+        JPanel monthNavPanel = new JPanel(new FlowLayout());
+        monthNavPanel.add(previousMonthButton);
+        monthNavPanel.add(monthYearLabel);
+        monthNavPanel.add(nextMonthButton);
+
+        topPanel.add(monthNavPanel, BorderLayout.CENTER);
         this.add(topPanel, BorderLayout.NORTH);
 
         JPanel dayAndDayNamePanel = new JPanel(new BorderLayout());

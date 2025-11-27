@@ -39,4 +39,9 @@ public class CalendarFlowPresenter implements CalendarFlowOutputBoundary {
         viewManagerModel.firePropertyChange();
     }
 
+    @Override
+    public void switchToDashboardView() {
+        viewManagerModel.setState("display local events");
+        viewManagerModel.firePropertyChange();
+    }
 }

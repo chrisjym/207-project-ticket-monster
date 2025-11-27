@@ -22,8 +22,6 @@ public class CalendarFlowDataAccessObject implements CalendarFlowDataAccessInter
     private static final String API_KEY = "YOUR_API_KEY_HERE";
     private final OkHttpClient client = new OkHttpClient();
 
-//    public CalendarFlowDataAccessObject() {
-//    }
     /**
      * Search events by date
      * @param date the selected specific date

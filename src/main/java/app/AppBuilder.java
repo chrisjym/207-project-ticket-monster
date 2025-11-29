@@ -10,6 +10,7 @@ import view.*;
 
 
 import data_access.FileUserDataAccessObject;
+import entity.Event;
 import entity.Location;
 import data_access.EventDataAccessObject;
 import data_access.TicketmasterEventRepositoryAdapter;
@@ -45,9 +46,10 @@ import interface_adapter.save_event.SaveEventController;
 import interface_adapter.save_event.SaveEventPresenter;
 import interface_adapter.save_event.SaveEventViewModel;
 
-import interface_adapter.displaylocalevents.DisplayLocalEventsController;
-import interface_adapter.displaylocalevents.DisplayLocalEventsPresenter;
-import interface_adapter.displaylocalevents.DisplayLocalEventsViewModel;
+import interface_adapter.display_local_events.DisplayLocalEventsController;
+import interface_adapter.display_local_events.DisplayLocalEventsPresenter;
+import interface_adapter.display_local_events.DisplayLocalEventsViewModel;
+import interface_adapter.ViewManagerModel;
 
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
@@ -85,12 +87,33 @@ import use_case.save_event.SaveEventOutputBoundary;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * AppBuilder - Constructs and wires together all components of the application.
+ *
+ * CLEAN ARCHITECTURE NOTE:
+ * This class is responsible for Dependency Injection and wiring.
+ * It creates all the layers and connects them:
+ *
+ * 1. ENTITIES (innermost): Event, User, Location, etc.
+ * 2. USE CASES: Interactors (business logic)
+ * 3. INTERFACE ADAPTERS: Controllers, Presenters, ViewModels
+ * 4. FRAMEWORKS & DRIVERS (outermost): Views, Data Access Objects
+ *
+ * The Dependency Rule: Dependencies point INWARD.
+ * - Views depend on ViewModels and Controllers
+ * - Controllers depend on Use Case Input Boundaries (interfaces)
+ * - Presenters implement Use Case Output Boundaries (interfaces)
+ * - Use Cases depend on Entity interfaces, not concrete implementations
+ *
+ * This builder ensures proper dependency injection so each layer
+ * only knows about the layers inside it, never outside.
+ */
 public class AppBuilder {
     private EventDescriptionViewModel eventDescriptionViewModel;
     private EventDescriptionView eventDescriptionView;
 
-    // temporary Event DAO (for now, in-memory)
     final EventDataAccessInterface eventDataAccessObject = new InMemoryEventDataAccessObject();
+    final FileSavedEventsDataAccessObject savedEventsDAO = new FileSavedEventsDataAccessObject();
 
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -98,16 +121,8 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    // set which data access implementation to use, can be any
-    // of the classes from the data_access package
-
-    // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject =
             new FileUserDataAccessObject("users.csv", userFactory);
-
-    // DAO version using a shared external database
-    // final DBUserDataAccessObject userDataAccessObject =
-    //        new DBUserDataAccessObject(userFactory);
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -120,7 +135,8 @@ public class AppBuilder {
     private SaveEventViewModel saveEventViewModel;
     private SaveEventsView saveEventsView;
     private SaveButtonView saveButtonView;
-
+    private SaveEventInteractor saveEventInteractor;
+    private SaveEventController saveEventController;
 
     private CalendarFlowViewModel calendarFlowViewModel;
     private CalendarView calendarView;
@@ -159,14 +175,7 @@ public class AppBuilder {
         eventListByDateView = new EventListByDateView(calendarFlowViewModel);
         calendarView = new CalendarView();
         cardPanel.add(calendarView, "calendar view");
-        cardPanel.add(eventListByDateView, calendarFlowViewModel.getViewName()); // "event list by date"
-
-        // Back button from list → calendar implement when combining project
-//        eventListByDateView.setBackButtonAction(e -> {
-//            viewManagerModel.setState("calendar view");
-//            viewManagerModel.firePropertyChange();
-//        });
-
+        cardPanel.add(eventListByDateView, calendarFlowViewModel.getViewName());
         return this;
     }
 
@@ -174,11 +183,11 @@ public class AppBuilder {
         displayLocalEventsViewModel = new DisplayLocalEventsViewModel();
         displayLocalEventsView = new DisplayLocalEventsView(displayLocalEventsViewModel);
         displayLocalEventsView.setViewManagerModel(viewManagerModel);
+        displayLocalEventsView.setViewManagerModel(viewManagerModel);
         displayLocalEventsView.setCalendarView(calendarView);
         cardPanel.add(displayLocalEventsView, displayLocalEventsView.getViewName());
         return this;
     }
-
 
     public AppBuilder addEventSearchView() {
         searchEventViewModel = new SearchEventByNameViewModel();
@@ -186,7 +195,6 @@ public class AppBuilder {
         cardPanel.add(searchEventView, searchEventView.getViewName());
         return this;
     }
-
 
     public AppBuilder addSaveEventView() {
         saveEventViewModel = new SaveEventViewModel();
@@ -203,18 +211,17 @@ public class AppBuilder {
                 viewManagerModel
         );
 
-        final SaveEventInputBoundary saveEventInteractor = new SaveEventInteractor(
+        this.saveEventInteractor = new SaveEventInteractor(
                 saveEventPresenter,
                 savedEventsDAO,
                 userDataAccessObject
         );
 
-        final SaveEventController saveEventController = new SaveEventController(saveEventInteractor);
+        this.saveEventController = new SaveEventController(saveEventInteractor);
 
-        // Set the controller and interactor for the views
         if (saveEventsView != null) {
             saveEventsView.setSaveEventController(saveEventController);
-
+            saveEventsView.setSaveEventInteractor(saveEventInteractor);
         }
 
         if (saveButtonView != null) {
@@ -239,11 +246,10 @@ public class AppBuilder {
 
         final SearchEventByNameController controller = new SearchEventByNameController(interactor);
         searchEventView.setEventController(controller);
+        searchEventView.setSaveButtonController(saveEventController);
 
         return this;
     }
-
-
 
     public AppBuilder addSignupUseCase() {
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
@@ -305,7 +311,6 @@ public class AppBuilder {
         return this;
     }
 
-
     public AppBuilder addDisplayLocalEventsUseCase() {
         EventDataAccessObject dao = new EventDataAccessObject();
 
@@ -330,7 +335,7 @@ public class AppBuilder {
                 new TicketmasterEventRepositoryAdapter(dao, defaultCenter, defaultRadiusKm);
 
         DisplayLocalEventsOutputBoundary outputBoundary =
-                new DisplayLocalEventsPresenter(displayLocalEventsViewModel);
+                new DisplayLocalEventsPresenter(displayLocalEventsViewModel, viewManagerModel);
 
         DisplayLocalEventsInputBoundary interactor =
                 new DisplayLocalEventsInteractor(eventRepository, outputBoundary);
@@ -344,14 +349,40 @@ public class AppBuilder {
         return this;
     }
 
-
+    /**
+     * Add Event Description View.
+     *
+     * CLEAN ARCHITECTURE NOTE:
+     * The View is created with its ViewModel.
+     * The View only knows about the ViewModel, not about Use Cases or Data Access.
+     */
     public AppBuilder addEventDescriptionView() {
         eventDescriptionViewModel = new EventDescriptionViewModel();
         eventDescriptionView = new EventDescriptionView(eventDescriptionViewModel);
+        eventDescriptionView.setViewManagerModel(viewManagerModel);
         cardPanel.add(eventDescriptionView, eventDescriptionView.getViewName());
         return this;
     }
 
+    /**
+     * Add Event Description Use Case and wire up event navigation.
+     *
+     * CLEAN ARCHITECTURE NOTE:
+     * This method demonstrates the complete wiring of Clean Architecture:
+     *
+     * 1. Create the Use Case (Interactor) with its dependencies:
+     *    - Data Access (injected via interface)
+     *    - Output Boundary (Presenter implements this interface)
+     *
+     * 2. Create the Controller with the Use Case (via Input Boundary interface)
+     *
+     * 3. Wire the View to use the Controller
+     *
+     * 4. Set up navigation using an EventSelectionListener
+     *    - This follows the Dependency Inversion Principle
+     *    - The View depends on an abstraction (listener interface)
+     *    - The concrete implementation is injected here
+     */
     public AppBuilder addEventDescriptionUseCase() {
         DistanceCalculator distanceCalculator = new HaversineDistanceCalculator();
 
@@ -364,26 +395,46 @@ public class AppBuilder {
         EventDescriptionController controller =
                 new EventDescriptionController(interactor);
 
-//        eventDescriptionView.setController(controller);
+        // Wire the save event controller to the event description view
+        if (saveEventController != null) {
+            eventDescriptionView.setSaveEventController(saveEventController);
+        }
+
+        // Set up the event selection listener for navigation from DisplayLocalEventsView
+        // This is where we connect the "click on event card" action to the navigation
+        displayLocalEventsView.setEventSelectionListener(new DisplayLocalEventsView.EventSelectionListener() {
+            @Override
+            public void onEventSelected(Event event) {
+                // Store the event in the view for display
+                eventDescriptionView.displayEvent(event);
+
+                // Calculate and set distance
+                Location userLocation = displayLocalEventsView.getCurrentLocationForOthers();
+                if (userLocation != null && event.getLocation() != null) {
+                    double distance = event.calculateDistanceTo(userLocation);
+                    eventDescriptionView.setDistanceText(String.format("%.1f km from your location", distance));
+                } else {
+                    eventDescriptionView.setDistanceText("Distance unavailable");
+                }
+
+                // Navigate to the event description view
+                viewManagerModel.setState(eventDescriptionView.getViewName());
+                viewManagerModel.firePropertyChange();
+            }
+        });
+
         return this;
     }
 
-
     public JFrame build() {
-        final JFrame application = new JFrame("User Login Example");
+        final JFrame application = new JFrame("Event Gate");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);
 
-        // TODO: FOR DEBUGGING PURPOSES ONLY
-        //viewManagerModel.setState(eventDescriptionView.getViewName());
-
-        // TODO: KEEP CODE BELOW
         viewManagerModel.setState(signupView.getViewName());
         viewManagerModel.firePropertyChange();
 
         return application;
     }
-
-
 }

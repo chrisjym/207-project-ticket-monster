@@ -6,10 +6,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 简化的 ViewModel - 基本的 PropertyChange 支持
- */
-
 public class DisplayLocalEventsViewModel extends ViewModel<DisplayLocalEventsState> {
 
     public static final String VIEW_NAME = "display local events";
@@ -60,7 +56,7 @@ public class DisplayLocalEventsViewModel extends ViewModel<DisplayLocalEventsSta
         public String getImageUrl() { return imageUrl; }
     }
 
-    // Getter/setter for Event objects (for navigation)
+
     public List<Event> getEvents() {
         return events;
     }
@@ -118,7 +114,7 @@ public class DisplayLocalEventsViewModel extends ViewModel<DisplayLocalEventsSta
         return this.getState().hasError();
     }
 
-    // Search parameter methods
+
     public void updateSearchParams(String location, String category, double radius) {
         this.getState().setLastSearchLocation(location);
         this.getState().setLastSearchCategory(category);

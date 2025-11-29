@@ -362,7 +362,7 @@ public class AppBuilder {
                 new TicketmasterEventRepositoryAdapter(dao, defaultCenter, defaultRadiusKm);
 
         DisplayLocalEventsOutputBoundary outputBoundary =
-                new DisplayLocalEventsPresenter(displayLocalEventsViewModel, viewManagerModel);
+                new DisplayLocalEventsPresenter(displayLocalEventsViewModel, viewManagerModel, saveEventViewModel);
 
         DisplayLocalEventsInputBoundary interactor =
                 new DisplayLocalEventsInteractor(eventRepository, outputBoundary);
@@ -454,7 +454,7 @@ public class AppBuilder {
     }
 
     public JFrame build() {
-        final JFrame application = new JFrame("Event Gate");
+        final JFrame application = new JFrame("Ticketmaster Program");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);

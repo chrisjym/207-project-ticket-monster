@@ -17,9 +17,8 @@ public interface CalendarFlowOutputBoundary {
      */
     void prepareFailView(String errorMessage);
 
-//    //to implement later
-//    /**
-//     * Switch to the Dashboard View.
-//     */
-//    void switchToDashboardView();
+    /**
+     * Switch to the Dashboard View.
+     */
+    void switchToDashboardView();
 }

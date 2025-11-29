@@ -15,6 +15,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -35,6 +37,9 @@ public class DisplayLocalEventsView extends JPanel implements PropertyChangeList
 
     private DisplayLocalEventsController controller;
     private final DisplayLocalEventsViewModel viewModel;
+
+    private CalendarView calendarView;
+
     private final String viewName = "display local events";
 
     // Location components
@@ -263,6 +268,14 @@ public class DisplayLocalEventsView extends JPanel implements PropertyChangeList
         }
     }
 
+
+    public void setCalendarView(CalendarView calendarView) {
+        this.calendarView = calendarView;
+    }
+
+    /**
+     * Build a two-row top bar for better layout.
+     */
     private JPanel buildTopBar() {
         JPanel topBarContainer = new JPanel();
         topBarContainer.setLayout(new BoxLayout(topBarContainer, BoxLayout.Y_AXIS));
@@ -421,6 +434,13 @@ public class DisplayLocalEventsView extends JPanel implements PropertyChangeList
         styleSideButton(calendarButton, "Calendar");
         styleSideButton(savedEventsButton, "Saved");
         styleSideButton(logoutButton, "Logout");
+
+        savedEventsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.switchToSaveView();
+            }
+        });
 
         sideBar.add(calendarButton);
         sideBar.add(Box.createVerticalStrut(8));
@@ -798,6 +818,12 @@ public class DisplayLocalEventsView extends JPanel implements PropertyChangeList
     }
 
     private void navigateToCalendar() {
+        Location userLoc = getCurrentLocation();
+        if (calendarView != null) {
+            calendarView.setUserLocation(userLoc);
+            calendarView.setSearchRadiusKm(DEFAULT_RADIUS_KM);
+        }
+
         if (viewManagerModel != null) {
             viewManagerModel.setState("calendar view");
             viewManagerModel.firePropertyChange();

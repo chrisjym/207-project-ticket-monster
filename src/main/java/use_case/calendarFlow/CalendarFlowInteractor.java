@@ -46,9 +46,8 @@ public class CalendarFlowInteractor implements CalendarFlowInputBoundary {
         }
     }
 
-//    //to implement later
-//    @Override
-//    public void switchToDashboardView() {
-//        presenter.switchToDashboardView();
-//    }
+    @Override
+    public void switchToDashboardView() {
+        presenter.switchToDashboardView();
+    }
 }

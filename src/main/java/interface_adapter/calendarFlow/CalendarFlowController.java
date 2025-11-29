@@ -24,8 +24,7 @@ public class CalendarFlowController {
         CalendarFlowInteractor.execute(inputData);
     }
 
-//    //to implement later
-//    public void switchToDashboardView() {
-//        CalendarFlowInteractor.switchToDashboardView();
-//    }
+    public void switchToDashboardView() {
+        CalendarFlowInteractor.switchToDashboardView();
+    }
 }

@@ -3,20 +3,18 @@ package interface_adapter.display_local_events;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 简化的 State 类 - 只存储必要的数据
- */
+
 public class DisplayLocalEventsState {
     private List<DisplayLocalEventsViewModel.EventCard> eventCards = new ArrayList<>();
     private String message = "";
     private String error = "";
 
-    // 搜索参数
+
     private String lastSearchLocation = "";
     private String lastSearchCategory = "";
     private double lastSearchRadius = 0.0;
 
-    // Getters and Setters
+
     public List<DisplayLocalEventsViewModel.EventCard> getEventCards() {
         return eventCards;
     }

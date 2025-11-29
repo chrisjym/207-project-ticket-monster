@@ -21,8 +21,6 @@ public class CalendarFlowDataAccessObject implements CalendarFlowDataAccessInter
     private static final String API_KEY = System.getenv("TICKETMASTER_API_KEY");
     private final OkHttpClient client = new OkHttpClient();
 
-//    public CalendarFlowDataAccessObject() {
-//    }
     /**
      * Search events by date
      * @param date the selected specific date

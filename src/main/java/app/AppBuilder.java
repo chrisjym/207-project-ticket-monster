@@ -99,25 +99,8 @@ import java.awt.*;
 
 /**
  * AppBuilder - Constructs and wires together all components of the application.
- *
- * CLEAN ARCHITECTURE NOTE:
- * This class is responsible for Dependency Injection and wiring.
- * It creates all the layers and connects them:
- *
- * 1. ENTITIES (innermost): Event, User, Location, etc.
- * 2. USE CASES: Interactors (business logic)
- * 3. INTERFACE ADAPTERS: Controllers, Presenters, ViewModels
- * 4. FRAMEWORKS & DRIVERS (outermost): Views, Data Access Objects
- *
- * The Dependency Rule: Dependencies point INWARD.
- * - Views depend on ViewModels and Controllers
- * - Controllers depend on Use Case Input Boundaries (interfaces)
- * - Presenters implement Use Case Output Boundaries (interfaces)
- * - Use Cases depend on Entity interfaces, not concrete implementations
- *
- * This builder ensures proper dependency injection so each layer
- * only knows about the layers inside it, never outside.
  */
+
 public class AppBuilder {
     private EventDescriptionViewModel eventDescriptionViewModel;
     private EventDescriptionView eventDescriptionView;
@@ -216,9 +199,8 @@ public class AppBuilder {
         displayLocalEventsViewModel = new DisplayLocalEventsViewModel();
         displayLocalEventsView = new DisplayLocalEventsView(displayLocalEventsViewModel);
         displayLocalEventsView.setViewManagerModel(viewManagerModel);
-        //debug purposes only
-        displayLocalEventsView.setViewManagerModel(viewManagerModel);  // THIS LINE IS CRITICAL!
-
+        displayLocalEventsView.setViewManagerModel(viewManagerModel);
+        displayLocalEventsView.setCalendarView(calendarView);
         cardPanel.add(displayLocalEventsView, displayLocalEventsView.getViewName());
         return this;
     }
@@ -345,6 +327,8 @@ public class AppBuilder {
                 new CalendarFlowInteractor(calendarGateway, calendarOutputBoundary);
         CalendarFlowController calendarController = new CalendarFlowController(calendarInteractor);
         calendarView.setEventController(calendarController);
+        eventListByDateView.setController(calendarController);
+
 
         return this;
     }
@@ -373,7 +357,7 @@ public class AppBuilder {
                 new TicketmasterEventRepositoryAdapter(dao, defaultCenter, defaultRadiusKm);
 
         DisplayLocalEventsOutputBoundary outputBoundary =
-                new DisplayLocalEventsPresenter(displayLocalEventsViewModel, viewManagerModel);
+                new DisplayLocalEventsPresenter(displayLocalEventsViewModel, viewManagerModel, saveEventViewModel);
 
         DisplayLocalEventsInputBoundary interactor =
                 new DisplayLocalEventsInteractor(eventRepository, outputBoundary);
@@ -465,15 +449,7 @@ public class AppBuilder {
     }
 
     public JFrame build() {
-        // debuggggg...........
-        System.out.println("=== REGISTERED VIEWS ===");
-        for (Component comp : cardPanel.getComponents()) {
-            System.out.println("View: " + comp.getName());
-        }
-        System.out.println("========================");
-
-
-        final JFrame application = new JFrame("Event Gate");
+        final JFrame application = new JFrame("Ticketmaster Program");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);

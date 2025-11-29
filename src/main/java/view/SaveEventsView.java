@@ -17,6 +17,7 @@ import java.util.List;
 /**
  * View for displaying saved events.
  * Shows all events the user has saved and allows them to remove events.
+ * Automatically refreshes when the view becomes visible.
  */
 public class SaveEventsView extends JPanel implements PropertyChangeListener {
 
@@ -27,7 +28,7 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
     private SaveEventController saveEventController;
 
     private final JPanel eventsContainer = new JPanel();
-    private final JButton backButton = new JButton("← Back to Events");
+    private final JButton backButton = new JButton("<- Back to Events");
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a");
 
     public SaveEventsView(SaveEventViewModel viewModel) {
@@ -48,9 +49,17 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
         JScrollPane scrollPane = new JScrollPane(eventsContainer);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);  // No horizontal scroll
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);  // Vertical only when needed
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(scrollPane, BorderLayout.CENTER);
+
+        // Auto-refresh when view becomes visible
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                renderSavedEvents();
+            }
+        });
 
         // Initial render
         renderSavedEvents();
@@ -118,7 +127,7 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
 
     /**
      * Render the saved events list.
-     * Called on initial load and when events change.
+     * Called on initial load, when view becomes visible, and when events change.
      */
     public void renderSavedEvents() {
         eventsContainer.removeAll();
@@ -127,6 +136,7 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
         if (saveEventInteractor != null) {
             try {
                 savedEvents = saveEventInteractor.getSavedEvents();
+                System.out.println("Loaded " + (savedEvents != null ? savedEvents.size() : 0) + " saved events");
             } catch (Exception e) {
                 System.err.println("Error getting saved events: " + e.getMessage());
             }
@@ -171,10 +181,16 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
         emptyPanel.setBackground(new Color(245, 247, 250));
         emptyPanel.setBorder(new EmptyBorder(50, 50, 50, 50));
 
+        // Icon
+        JLabel iconLabel = new JLabel("*", SwingConstants.CENTER);
+        iconLabel.setFont(new Font("Segoe UI", Font.BOLD, 48));
+        iconLabel.setForeground(new Color(150, 150, 150));
+        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         // Title
         JLabel titleLabel = new JLabel("No Saved Events Yet");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        titleLabel.setForeground(new Color(0, 0, 0));
+        titleLabel.setForeground(new Color(50, 50, 50));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Description
@@ -188,13 +204,14 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
         JButton browseButton = new JButton("Browse Events");
         browseButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         browseButton.setForeground(Color.WHITE);
-        browseButton.setBackground(new Color(0, 0, 0));
+        browseButton.setBackground(new Color(59, 130, 246));
         browseButton.setBorder(new EmptyBorder(12, 24, 12, 24));
         browseButton.setFocusPainted(false);
         browseButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         browseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         browseButton.addActionListener(e -> navigateBack());
 
+        emptyPanel.add(iconLabel);
         emptyPanel.add(Box.createVerticalStrut(20));
         emptyPanel.add(titleLabel);
         emptyPanel.add(Box.createVerticalStrut(12));
@@ -226,8 +243,9 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setOpaque(false);
 
-        // Event name
-        JLabel nameLabel = new JLabel(event.getName());
+        // Event name (truncated if too long)
+        String eventName = truncateText(event.getName(), 50);
+        JLabel nameLabel = new JLabel(eventName);
         nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         nameLabel.setForeground(new Color(30, 30, 30));
         nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -243,7 +261,8 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
 
         // Location
         String address = event.getLocation() != null ? event.getLocation().getAddress() : "Location not available";
-        JLabel locationLabel = new JLabel("📍 " + address);
+        String truncatedAddress = truncateText(address, 60);
+        JLabel locationLabel = new JLabel(truncatedAddress);
         locationLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         locationLabel.setForeground(new Color(100, 100, 100));
         locationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -251,7 +270,7 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
         // Date/Time
         String dateTime = event.getStartTime() != null ?
                 event.getStartTime().format(dateFormatter) : "Date not available";
-        JLabel dateLabel = new JLabel("📅 " + dateTime);
+        JLabel dateLabel = new JLabel(dateTime);
         dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         dateLabel.setForeground(new Color(100, 100, 100));
         dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -341,6 +360,15 @@ public class SaveEventsView extends JPanel implements PropertyChangeListener {
         });
 
         return card;
+    }
+
+    /**
+     * Truncate text to a maximum length, adding "..." if truncated.
+     */
+    private String truncateText(String text, int maxLength) {
+        if (text == null) return "";
+        if (text.length() <= maxLength) return text;
+        return text.substring(0, maxLength - 3) + "...";
     }
 
     // Setters for dependency injection

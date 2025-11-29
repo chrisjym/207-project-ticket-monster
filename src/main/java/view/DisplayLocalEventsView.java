@@ -68,6 +68,9 @@ public class DisplayLocalEventsView extends JPanel implements PropertyChangeList
     private final JLabel emptyStateLabel = new JLabel("Set your location and search to see local events.", SwingConstants.CENTER);
     private static final double DEFAULT_RADIUS_KM = 50.0;
     private ViewManagerModel viewManagerModel;
+    private final JComboBox<String> cityBox =
+            new JComboBox<>(new String[]{"Toronto", "Montreal", "New York"});
+
 
     // User's saved location
     private Location userLocation = null;
@@ -827,6 +830,24 @@ public class DisplayLocalEventsView extends JPanel implements PropertyChangeList
         if (viewManagerModel != null) {
             viewManagerModel.setState("calendar view");
             viewManagerModel.firePropertyChange();
+        }
+    }
+
+
+    private Location getCurrentLocation() {
+        String selectedCity = (String) cityBox.getSelectedItem();
+        if (selectedCity == null) {
+            return new Location("Toronto, ON", 43.6532, -79.3832);
+        }
+
+        switch (selectedCity) {
+            case "Montreal":
+                return new Location("Montreal, QC", 45.5019, -73.5674);
+            case "New York":
+                return new Location("New York, NY", 40.7128, -74.0060);
+            case "Toronto":
+            default:
+                return new Location("Toronto, ON", 43.6532, -79.3832);
         }
     }
 

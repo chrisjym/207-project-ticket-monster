@@ -818,7 +818,12 @@ public class DisplayLocalEventsView extends JPanel implements PropertyChangeList
     }
 
     private void navigateToCalendar() {
-        Location userLoc = getCurrentLocation();
+        // Use the user's saved/entered location, or default to Toronto
+        Location userLoc = userLocation;
+        if (userLoc == null) {
+            userLoc = new Location("Toronto, ON", 43.6532, -79.3832);
+        }
+
         if (calendarView != null) {
             calendarView.setUserLocation(userLoc);
             calendarView.setSearchRadiusKm(DEFAULT_RADIUS_KM);

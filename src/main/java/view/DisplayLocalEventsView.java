@@ -380,7 +380,7 @@ public class DisplayLocalEventsView extends JPanel implements PropertyChangeList
         searchLabel.setForeground(Color.WHITE);
         nameSearchPanel.add(searchLabel);
 
-        searchBarView = new SearchBarView("Event name...", userLocation);
+        searchBarView = new SearchBarView("Event name...", new Location("Toronto, ON", 43.6426, 79.3871));
         searchBarView.setPreferredSize(new Dimension(180, 32));
         nameSearchPanel.add(searchBarView);
 
